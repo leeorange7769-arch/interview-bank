@@ -135,6 +135,8 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
     ];
   }
 
+  function loadDeleted() { try { var s = localStorage.getItem(SK_DEL); if (s) { var p = JSON.parse(s); if (Array.isArray(p)) return p; } } catch(e) {} return []; }
+  function saveDeleted(d) { try { localStorage.setItem(SK_DEL, JSON.stringify(d)); } catch(e) {} if (syncEnabled && syncUrl) { fetch(syncUrl + '/deleted.json', { method: 'PUT', body: JSON.stringify(d) }).catch(function(){}); } }
   function loadQuestions() {
     // 先尝试读本地缓存作为初始值，异步从云端拉取最新数据
     try { var s = localStorage.getItem(SK_Q); if (s) { var p = JSON.parse(s); if (Array.isArray(p)) return p; } } catch (e) {}
