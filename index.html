@@ -330,7 +330,7 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
     var cat = document.getElementById('formCategory').value, qtxt = document.getElementById('formQuestion').value.trim(), atxt = document.getElementById('formAnswer').value.trim(), img = document.getElementById('formImage').value.trim();
     if (!cat) { showToast('\u8BF7\u9009\u62E9\u9898\u578B\u5206\u7C7B'); return; }
     if (!qtxt) { showToast('\u8BF7\u8F93\u5165\u9762\u8BD5\u9898\u5E72'); return; }
-    if (editingId) { var i = questions.findIndex(function(x) { return x.id === editingId; }); if (i !== -1) { questions[i].category = cat; questions[i].question = qtxt; questions[i].answer = atxt; questions[i].image = img; } showToast('\u9898\u76EE\u5DF2\u66F4\u65B0'); }
+    if (editingId) { var i = questions.findIndex(function(x) { return x.id === editingId; }); if (i !== -1) { questions[i].category = cat; questions[i].question = qtxt; questions[i].answer = atxt; questions[i].image = img; showToast('\u9898\u76EE\u5DF2\u66F4\u65B0'); } else { showToast('\u66F4\u65B0\u5931\u8D25\uFF1A\u627E\u4E0D\u5230\u9898\u76EEID=' + editingId); } }
     else { questions.push({ id: genId(), category: cat, question: qtxt, answer: atxt, image: img }); showToast('\u9898\u76EE\u5DF2\u6DFB\u52A0'); }
     saveQuestions(questions); closeModal(); renderSidebar(); renderQuestions();
   }
