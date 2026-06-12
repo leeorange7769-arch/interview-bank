@@ -36,6 +36,9 @@
     .question-card:hover { transform: translateY(-1px); }
     .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-120px); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; }
     .toast.show { transform: translateX(-50%) translateY(0); }
+    .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: flex; align-items: center; justify-content: center; cursor: zoom-out; opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease; }
+    .lightbox.active { opacity: 1; visibility: visible; }
+    .lightbox img { max-width: 95vw; max-height: 95vh; object-fit: contain; border-radius: 4px; }
   </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-200">
@@ -325,7 +328,7 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
   function executeDelete() { if (!pendingDel) return; questions = questions.filter(function(q) { return q.id !== pendingDel; }); try { localStorage.removeItem(SK_N + pendingDel); } catch (e) {} saveQuestions(questions); closeConfirmDialog(); renderSidebar(); renderQuestions(); showToast('\u9898\u76EE\u5DF2\u5220\u9664'); }
 
   function handleBackToTop() { var b = document.getElementById('backToTop'); if (window.scrollY > 400) b.classList.add('visible'); else b.classList.remove('visible'); }
-  function handleKeyboard(e) { if (e.key === 'Escape') { if (!document.getElementById('confirmDialog').classList.contains('hidden')) closeConfirmDialog(); else if (document.getElementById('questionModal').classList.contains('active')) closeModal(); } }
+  function handleKeyboard(e) { if (e.key === 'Escape') { if (document.getElementById('imageLightbox').classList.contains('active')) { closeLightbox(); return; } if (!document.getElementById('confirmDialog').classList.contains('hidden')) closeConfirmDialog(); else if (document.getElementById('questionModal').classList.contains('active')) closeModal(); } }
 
   function init() {
     questions = loadQuestions();
@@ -347,11 +350,12 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
   function closeSyncModalOutside(e) { if (e.target === document.getElementById('syncModal')) closeSyncModal(); }
   function saveSyncConfig() { var url = document.getElementById('syncUrlInput').value.trim(); if (!url) { showToast('请输入数据库 URL'); return; } if (url.indexOf('firebasedatabase.app') === -1) { showToast('URL 格式不正确，请检查'); return; } saveSyncUrl(url); syncUrl = url; syncEnabled = true; updateSyncUI(); closeSyncModal(); showToast('云同步已启用'); syncAllFromCloud(); }
   function disableSync() { saveSyncUrl(''); syncUrl = ''; syncEnabled = false; updateSyncUI(); closeSyncModal(); showToast('云同步已关闭'); }
-  function handleImageFile(input) { var f = input.files[0]; if (!f) return; var reader = new FileReader(); reader.onload = function(e) { setImagePreview(e.target.result); }; reader.readAsDataURL(f); }
+  function handleImageFile(input) { var f = input.files[0]; if (!f) return; var reader = new FileReader(); reader.onload = function(e) { compressImage(e.target.result, 1200, 0.85, function(compressed) { setImagePreview(compressed); }); }; reader.readAsDataURL(f); }
+  function compressImage(dataUrl, maxSize, quality, cb) { var img = new Image(); img.onload = function() { var w = img.width, h = img.height; if (w <= maxSize && h <= maxSize) { cb(dataUrl); return; } var ratio = Math.min(maxSize / w, maxSize / h); w = Math.round(w * ratio); h = Math.round(h * ratio); var canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h; var ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h); cb(canvas.toDataURL('image/jpeg', quality)); }; img.src = dataUrl; }
   function setImagePreview(dataUrl) { document.getElementById('formImage').value = dataUrl; document.getElementById('imagePreviewImg').src = dataUrl; document.getElementById('imagePreview').classList.remove('hidden'); document.getElementById('imagePlaceholder').classList.add('hidden'); document.getElementById('clearImageBtn').classList.remove('hidden'); }
   function clearImage() { document.getElementById('formImage').value = ''; document.getElementById('imagePreview').classList.add('hidden'); document.getElementById('imagePlaceholder').classList.remove('hidden'); document.getElementById('clearImageBtn').classList.add('hidden'); document.getElementById('formImageFile').value = ''; }
   var _pasteHandler = null;
-  function attachPaste() { if (_pasteHandler) return; _pasteHandler = function(e) { if (!document.getElementById('questionModal').classList.contains('active')) return; var items = e.clipboardData.items; for (var i = 0; i < items.length; i++) { if (items[i].type.indexOf('image') !== -1) { e.preventDefault(); var blob = items[i].getAsFile(); var reader = new FileReader(); reader.onload = function(ev) { setImagePreview(ev.target.result); }; reader.readAsDataURL(blob); break; } } }; document.addEventListener('paste', _pasteHandler); }
+  function attachPaste() { if (_pasteHandler) return; _pasteHandler = function(e) { if (!document.getElementById('questionModal').classList.contains('active')) return; var items = e.clipboardData.items; for (var i = 0; i < items.length; i++) { if (items[i].type.indexOf('image') !== -1) { e.preventDefault(); var blob = items[i].getAsFile(); var reader = new FileReader(); reader.onload = function(ev) { setImagePreview(ev.target.result); }; reader.onload = function(ev) { compressImage(ev.target.result, 1200, 0.85, function(c) { setImagePreview(c); }); }; reader.readAsDataURL(blob); break; } } }; document.addEventListener('paste', _pasteHandler); }
   function detachPaste() { if (_pasteHandler) { document.removeEventListener('paste', _pasteHandler); _pasteHandler = null; } }
   function handleSyncClick() { syncNow(); }
   function testSyncConnection() { var url = document.getElementById('syncUrlInput').value.trim(); var el = document.getElementById('syncTestResult'); if (!url) { el.textContent = '请输入 URL'; el.className = 'text-xs text-red-500'; return; } el.textContent = '测试中…'; el.className = 'text-xs text-blue-500'; fetch(url + '/.json').then(function(r) { if (r.ok) { el.textContent = '✓ 连接成功'; el.className = 'text-xs text-green-500'; } else { el.textContent = '✗ 连接失败 (' + r.status + ')'; el.className = 'text-xs text-red-500'; } }).catch(function(e) { el.textContent = '✗ 连接失败: ' + e.message; el.className = 'text-xs text-red-500'; }); }
@@ -390,6 +394,8 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
   window.closeBatchImportModal = closeBatchImportModal;
   window.closeBatchImportOutside = closeBatchImportOutside;
   window.parseBatchPreview = parseBatchPreview;
+  window.openLightbox = function(src) { document.getElementById('lightboxImg').src = src; document.getElementById('imageLightbox').classList.add('active'); };
+  window.closeLightbox = function() { document.getElementById('imageLightbox').classList.remove('active'); };
   window.executeBatchImport = executeBatchImport;
   window.handleImageFile = handleImageFile;
   window.setImagePreview = setImagePreview;
@@ -400,5 +406,6 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 </script>
+<div id="imageLightbox" class="lightbox" onclick="closeLightbox()"><img id="lightboxImg" src="" alt=""></div>
 </body>
 </html>
