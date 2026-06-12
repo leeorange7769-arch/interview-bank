@@ -78,7 +78,7 @@
 
 <button id="backToTop" onclick="scrollToTop()" class="back-to-top fixed bottom-6 right-6 z-40 w-11 h-11 bg-navy-800 dark:bg-gray-700 hover:bg-navy-700 dark:hover:bg-gray-600 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg></button>
 
-<div id="questionModal" class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="closeModalOutside(event)">
+<div id="questionModal" class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
   <div class="modal-panel bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
     <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><h3 id="modalTitle" class="text-lg font-bold text-navy-900 dark:text-gray-100">新增题目</h3><button onclick="closeModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
     <form id="questionForm" onsubmit="return false" class="px-6 py-5 space-y-4">
@@ -344,7 +344,7 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
        saveDeleted(deletedQuestions); } questions = questions.filter(function(q) { return q.id !== pendingDel; }); saveQuestions(questions); closeConfirmDialog(); renderSidebar(); renderQuestions(); showToast('\u9898\u76EE\u5DF2\u5220\u9664'); }
 
   function handleBackToTop() { var b = document.getElementById('backToTop'); if (window.scrollY > 400) b.classList.add('visible'); else b.classList.remove('visible'); }
-  function handleKeyboard(e) { if (e.key === 'Escape') { if (document.getElementById('imageLightbox').classList.contains('active')) { closeLightbox(); return; } if (!document.getElementById('confirmDialog').classList.contains('hidden')) closeConfirmDialog(); else if (document.getElementById('questionModal').classList.contains('active')) closeModal(); } }
+  function handleKeyboard(e) { if (e.key === 'Escape') { if (document.getElementById('imageLightbox').classList.contains('active')) { closeLightbox(); return; } if (!document.getElementById('confirmDialog').classList.contains('hidden')) closeConfirmDialog();  } }
 
   function init() {
     questions = loadQuestions();
