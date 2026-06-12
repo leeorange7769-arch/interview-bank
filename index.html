@@ -1,178 +1,341 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>面试题库</title>
-<style>
-  body {
-    font-family: "微软雅黑", sans-serif;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 10px;
-    background: #f8f8f8;
-  }
-  h1 {
-    text-align: center;
-    color: #333;
-  }
-  #search {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-  }
-  .category-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 15px;
-  }
-  .category-btn {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 20px;
-    background: #007bff;
-    color: #fff;
-    cursor: pointer;
-  }
-  .category-btn.active {
-    background: #0056b3;
-  }
-  .item {
-    background: #fff;
-    padding: 12px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  }
-  .q {
-    font-weight: bold;
-    cursor: pointer;
-  }
-  .a {
-    margin-top: 8px;
-    color: #444;
-    display: none;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公务员面试题库 · 个人备考收藏</title>
+  <script src="https://cdn.tailwindcss.com">
+  
+  </script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { navy: { 50: '#f0f4f8', 100: '#d9e2ec', 200: '#bcccdc', 300: '#9fb3c8', 400: '#829ab1', 500: '#627d98', 600: '#486581', 700: '#334e68', 800: '#243b53', 900: '#1a2d47' } } } }
+    }
+  </script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+    .answer-body { max-height: 0; overflow: hidden; transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), padding 0.45s ease, opacity 0.3s ease; opacity: 0; padding-top: 0; padding-bottom: 0; }
+    .answer-body.open { max-height: 3000px; opacity: 1; padding-top: 1rem; padding-bottom: 1rem; }
+    .note-textarea { resize: vertical; min-height: 80px; line-height: 1.7; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+    .note-textarea:focus { outline: none; }
+    .back-to-top { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease; transform: translateY(20px); }
+    .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+    .modal-overlay { opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease; }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .modal-panel { transform: scale(0.95) translateY(10px); transition: transform 0.25s ease; }
+    .modal-overlay.active .modal-panel { transform: scale(1) translateY(0); }
+    @media (max-width: 767px) { .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; z-index: 50; } .sidebar.open { transform: translateX(0); } .sidebar-backdrop { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; } .sidebar-backdrop.active { opacity: 1; visibility: visible; } }
+    .question-card { transition: box-shadow 0.25s ease, transform 0.2s ease; }
+    .question-card:hover { transform: translateY(-1px); }
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-120px); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
 </head>
-<body>
-<h1>面试题库</h1>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-200">
 
-<input id="search" placeholder="搜索题目..." />
+<div id="toast" class="toast bg-gray-800 dark:bg-gray-100 text-white dark:text-gray-800 px-5 py-2.5 rounded-lg shadow-lg text-sm font-medium pointer-events-none"></div>
+<div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-40 md:hidden" onclick="closeSidebar()"></div>
 
-<div class="category-bar" id="categoryBar">
-  <button class="category-btn active" data-cat="all">全部</button>
+<aside id="sidebar" class="sidebar fixed left-0 top-0 h-full w-64 bg-navy-900 dark:bg-gray-950 text-white flex flex-col z-50 md:z-30 shadow-2xl md:shadow-xl">
+  <div class="px-5 py-5 border-b border-white/10"><div class="flex items-center gap-2.5"><svg class="w-7 h-7 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg><div><h1 class="text-base font-bold tracking-wide">面试题库</h1><p class="text-[10px] text-blue-200/60 tracking-wider">公务员面试 · 备考收藏</p></div></div></div>
+  <div class="px-4 py-3"><div class="relative"><svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input id="searchInput" type="text" placeholder="搜索面试题目…" oninput="handleSearch(this.value)" class="w-full pl-9 pr-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder-white/35 focus:outline-none focus:bg-white/15 focus:border-white/25 transition-colors"></div></div>
+  <nav class="flex-1 overflow-y-auto sidebar-scroll px-3 py-2"><p class="px-3 py-1 text-[11px] text-white/40 uppercase tracking-widest mb-1">题型分类</p><div id="categoryList" class="space-y-0.5"></div></nav>
+  <div class="px-4 py-3 border-t border-white/10 space-y-2">
+    <button onclick="openAddModal()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>新增题目</button>
+    <button onclick="openBatchImportModal()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors mt-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>批量导入</button>
+    <button onclick="handleSyncClick()" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white/8 hover:bg-white/12 text-white/80 text-sm rounded-lg transition-colors mb-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg><span id="syncLabel">云同步</span></button>
+    <button id="darkModeToggle" onclick="toggleDarkMode()" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white/8 hover:bg-white/12 text-white/80 text-sm rounded-lg transition-colors"><svg id="darkIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg><span id="darkModeLabel">暗黑模式</span></button>
+  </div>
+</aside>
+
+<header class="md:hidden fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 z-30 px-4 py-3 flex items-center justify-between shadow-sm">
+  <button onclick="toggleSidebar()" class="p-1.5 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"><svg class="w-6 h-6 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <h1 class="text-base font-bold text-navy-900 dark:text-gray-100">面试题库</h1>
+  <button onclick="openAddModal()" class="p-1.5 -mr-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-blue-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></button>
+</header>
+
+<main id="mainContent" class="md:ml-64 pt-14 md:pt-0 min-h-screen">
+  <div class="hidden md:flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 sticky top-0 z-20"><div><h2 id="currentCategoryTitle" class="text-lg font-bold text-navy-900 dark:text-gray-100">全部题目</h2><p id="questionCount" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"></p></div><button onclick="openAddModal()" class="flex items-center gap-1.5 px-4 py-2 bg-navy-800 dark:bg-blue-600 hover:bg-navy-700 dark:hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>新增题目</button></div>
+  <div class="px-4 md:px-6 py-5">
+    <div id="emptyState" class="hidden text-center py-20"><svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><p class="text-gray-400 dark:text-gray-500 text-sm">暂无匹配的题目</p><p class="text-gray-400 dark:text-gray-500 text-xs mt-1">试试切换分类或添加新题目</p></div>
+    <div id="questionList" class="space-y-4"></div>
+  </div>
+  <div class="h-16"></div>
+</main>
+
+<button id="backToTop" onclick="scrollToTop()" class="back-to-top fixed bottom-6 right-6 z-40 w-11 h-11 bg-navy-800 dark:bg-gray-700 hover:bg-navy-700 dark:hover:bg-gray-600 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg></button>
+
+<div id="questionModal" class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="closeModalOutside(event)">
+  <div class="modal-panel bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+    <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><h3 id="modalTitle" class="text-lg font-bold text-navy-900 dark:text-gray-100">新增题目</h3><button onclick="closeModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
+    <form id="questionForm" onsubmit="handleFormSubmit(event)" class="px-6 py-5 space-y-4">
+      <input type="hidden" id="editQuestionId" value="">
+      <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">题型分类 <span class="text-red-500">*</span></label><select id="formCategory" required class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"><option value="">请选择题型分类</option></select></div>
+      <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">面试题干 <span class="text-red-500">*</span></label><textarea id="formQuestion" required rows="3" placeholder="请输入完整的面试题干…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm resize-y focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"></textarea></div>
+      <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">题目图片（可选，漫画题适用）</label><div id="imageDropZone" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-colors" onclick="document.getElementById('formImageFile').click()"><div id="imagePreview" class="hidden mb-2"><img id="imagePreviewImg" src="" class="max-h-32 max-w-full mx-auto rounded-lg object-contain"></div><div id="imagePlaceholder"><svg class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><p class="text-xs text-gray-500 dark:text-gray-400">点击选择图片 或 直接 Ctrl+V 粘贴</p></div><input type="file" id="formImageFile" accept="image/*" class="hidden" onchange="handleImageFile(this)"><input type="hidden" id="formImage" value=""><button id="clearImageBtn" type="button" class="hidden mt-2 text-xs text-red-500 hover:text-red-400" onclick="clearImage()">移除图片</button></div>
+      </div>
+      <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">参考答案</label><textarea id="formAnswer" rows="5" placeholder="请输入参考答案（可留空后续补充）…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm resize-y focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"></textarea></div>
+      <div class="flex items-center justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">取消</button><button type="submit" class="px-5 py-2.5 bg-navy-800 dark:bg-blue-600 hover:bg-navy-700 dark:hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">保存题目</button></div>
+    </form>
+  </div>
 </div>
 
-<div id="list"></div>
+
+<div id="syncModal" class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="closeSyncModalOutside(event)"><div class="modal-panel bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()"><div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><h3 class="text-lg font-bold text-navy-900 dark:text-gray-100">云同步设置</h3><button onclick="closeSyncModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div><div class="px-6 py-5 space-y-4"><div class="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 text-sm text-blue-800 dark:text-blue-200"><p class="font-medium mb-1">你的数据库地址（已就绪）</p><p class="text-xs">打开 <a href="https://console.firebase.google.com" target="_blank" class="underline">Firebase 控制台</a> → Realtime Database → 复制页面顶部的数据库 URL，粘贴到下方。</p></div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Realtime Database URL</label><input id="syncUrlInput" type="text" placeholder="https://xxx-default-rtdb.asia-southeast1.firebasedatabase.app" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow font-mono text-xs"><div class="flex items-center justify-between"><button onclick="testSyncConnection()" class="px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors">测试连接</button><span id="syncTestResult" class="text-xs"></span></div><div class="flex items-center justify-end gap-3 pt-2"><button onclick="disableSync()" class="px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors">关闭同步</button><button onclick="closeSyncModal()" class="px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">取消</button><button onclick="saveSyncConfig()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">保存并启用</button></div></div></div></div>
+
+<div id="batchImportModal" class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="closeBatchImportOutside(event)"><div class="modal-panel bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()"><div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><h3 class="text-lg font-bold text-navy-900 dark:text-gray-100">批量导入题目</h3><button onclick="closeBatchImportModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div><div class="px-6 py-5 space-y-4"><div class="bg-amber-50 dark:bg-amber-900/30 rounded-lg p-4 text-sm text-amber-800 dark:text-amber-200"><p class="font-medium mb-1">粘贴格式说明</p><p class="text-xs">每道题用 <code>---</code>（三个减号，单独一行）分隔。题干以 <code>Q：</code> 开头，答案以 <code>A：</code> 开头。</p><pre class="text-xs mt-2 bg-amber-100 dark:bg-amber-800/50 p-2 rounded">Q：题干内容
+A：参考答案内容
+I：https://图片链接（可选）
+---
+Q：第二个题干
+A：第二个答案</pre></div><div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">默认分类 <span class="text-red-500">*</span></label><select id="batchCategory" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"><option value="">请选择</option></select></div><div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">粘贴问答内容</label><textarea id="batchContent" rows="10" placeholder="Q：题干…
+A：答案…
+---
+Q：题干…
+A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm resize-y focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow font-mono text-xs"></textarea></div><div><button onclick="parseBatchPreview()" class="px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors">预览解析结果</button><span id="batchPreview" class="text-xs text-gray-500 ml-3"></span></div><div class="flex items-center justify-end gap-3 pt-2"><button onclick="closeBatchImportModal()" class="px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">取消</button><button onclick="executeBatchImport()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">导入题目</button></div></div></div></div>
+<div id="confirmDialog" class="fixed inset-0 bg-black/50 z-50 items-center justify-center p-4 hidden"><div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-sm p-6"><h3 class="text-lg font-bold text-navy-900 dark:text-gray-100 mb-2">确认删除</h3><p class="text-sm text-gray-600 dark:text-gray-400 mb-6">删除后不可恢复，确定要删除这道题目吗？</p><div class="flex items-center justify-end gap-3"><button onclick="closeConfirmDialog()" class="px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">取消</button><button id="confirmDeleteBtn" class="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white text-sm font-medium rounded-lg transition-colors">确认删除</button></div></div></div>
 
 <script>
-// 1. 带时间戳，永久不缓存
-const jsonUrl =
-  "https://mianshi-bank-fb730-default-rtdb.asia-southeast1.firebasedatabase.app/notes/default_1.json?t=" +
-  new Date().getTime();
+(function() {
+  'use strict';
+  var CATEGORIES = ['综合分析社会现象题','综合分析态度观点/哲理题','人际沟通题','应急应变题','计划组织题','现场模拟题','创新题型（漫画/回旋镖热点/串词）'];
+  var SK_Q = 'interview_bank_questions_v1', SK_N = 'interview_bank_note_', SK_D = 'interview_bank_dark_mode', SK_C = 'interview_bank_current_category';
 
-let rawData = [];
-let currentCat = "all";
-
-async function loadData() {
-  try {
-    const res = await fetch(jsonUrl, { cache: "no-store" });
-    const data = await res.json();
-    if (Array.isArray(data)) {
-      rawData = data;
-    } else if (data && Array.isArray(data.list)) {
-      rawData = data.list;
-    } else {
-      rawData = [];
-    }
-    buildCategory();
-    renderList();
-  } catch (e) {
-    console.error("加载失败", e);
-    document.getElementById("list").innerText = "加载失败，请刷新重试";
+  function getDefaultQuestions() {
+    return [
+      {id:'default_1',category:CATEGORIES[0],question:'当前很多地方政府推行"一窗通办"改革，但部分群众反映窗口人员业务不熟、效率不高，对此你怎么看？',answer:'【参考答题思路】\n\n一、表态：\n"一窗通办"改革的出发点是好的，体现了"让数据多跑路、群众少跑腿"的服务理念，是深化"放管服"改革的重要举措。但改革落地过程中暴露出的问题也不容忽视，需要客观看待、务实解决。\n\n二、分析原因：\n1. 培训不到位：窗口人员需要掌握多个部门的业务，短期培训难以覆盖全部知识点；\n2. 系统整合不完善：不同部门的信息系统尚未真正打通，数据壁垒仍然存在；\n3. 激励机制不足：窗口工作压力大、考核多，但职业发展空间有限，影响工作积极性；\n4. 过渡期阵痛：改革涉及流程再造，短期内效率下降是正常现象。\n\n三、对策建议：\n1. 加强业务培训，建立"老带新"机制和常态化学习制度；\n2. 加快信息系统整合，真正实现数据共享和业务协同；\n3. 完善考核激励，将群众满意度纳入绩效考核，畅通窗口人员晋升通道；\n4. 设置过渡期和双轨运行机制，确保改革平稳推进；\n5. 建立问题反馈渠道，及时收集群众意见并优化流程。\n\n四、总结：\n改革不可能一蹴而就，关键是要坚持问题导向，在推进中发现问题、在解决问题中完善改革，最终让群众真正享受到便捷高效的政务服务。'},
+      {id:'default_2',category:CATEGORIES[0],question:'近年来"躺平"文化在年轻人中流行，有人认为这是对社会责任的逃避，有人认为这是对不合理压力的理性反抗，你怎么看？',answer:'【参考答题思路】\n\n一、表态：\n"躺平"现象是当代社会转型期出现的一种亚文化现象，需要以辩证的眼光看待，不能简单贴标签，也不能一味否定。\n\n二、分析原因（多角度）：\n1. 经济层面：高房价、就业竞争激烈、生活成本上升，年轻人感到向上流动的通道变窄；\n2. 社会层面：内卷化竞争严重，"996"工作模式让年轻人身心俱疲；\n3. 心理层面：部分年轻人对成功定义趋于多元，不再以传统的"升职加薪"为唯一目标；\n4. 网络放大效应：社交媒体加速了情绪的传播和共鸣。\n\n三、辩证看待：\n一方面，适度"躺平"可以理解为对过度竞争的一种自我保护，是对生活节奏的主动调整；另一方面，完全放弃奋斗、逃避社会责任则不利于个人成长。\n\n四、对策：\n1. 政府层面：完善社会保障体系，降低年轻人生活成本，创造更多公平发展机会；\n2. 社会层面：营造理性健康的社会氛围，反对过度内卷，提倡劳逸结合；\n3. 个人层面：在奋斗与休整之间找到平衡，保持积极向上的生活态度。\n\n五、总结：\n我们既不能对"躺平"简单批判，也不能听之任之，而应该从制度、文化、个人三个维度综合施策，让年轻人既有奋斗的动力，也有喘息的空间。'},
+      {id:'default_3',category:CATEGORIES[0],question:'数字化政务服务平台不断推出，但老年人等群体面临"数字鸿沟"问题，你认为政府应该如何解决？',answer:'【参考答题思路】\n\n一、表态：\n数字化政务服务是大势所趋，提高了行政效率，方便了大多数群众。但"数字鸿沟"问题本质上是公共服务公平性的问题——不能因为技术升级而把一部分群体排除在服务之外。\n\n二、分析影响：\n1. 老年人、残障人士、低收入群体等在就医、社保、出行等方面遇到困难；\n2. 如果处理不当，会加剧社会不平等，背离"以人民为中心"的发展理念。\n\n三、对策建议：\n1. 保留传统服务渠道：线下窗口、电话咨询等传统方式不能"一刀切"取消；\n2. 推进适老化改造：政务APP增加大字版、语音导航、简化操作流程；\n3. 开展数字帮扶：社区开设智能手机培训班，志愿者一对一辅导；\n4. 家人代办机制：完善授权代办功能，让子女可以帮老人办理业务；\n5. 从源头设计：在开发新系统时就考虑无障碍设计，而不是事后修补。\n\n四、总结：\n技术进步的目的是服务所有人。政务服务数字化必须坚持"一个都不能少"的原则。'},
+      {id:'default_4',category:CATEGORIES[1],question:'习近平总书记说："人民对美好生活的向往，就是我们的奋斗目标。"请结合实际谈谈你的理解。',answer:'【参考答题思路】\n\n一、阐释含义：\n这句话深刻揭示了中国共产党人的初心和使命——为人民服务不是抽象的口号，而是具体的行动指针。\n\n二、结合实际：\n1. 脱贫攻坚：近1亿农村贫困人口全部脱贫，这是对人民"过上好日子"向往的直接回应；\n2. 教育医疗：推进义务教育均衡发展、医保跨省结算等改革，回应群众"上好学、看好病"的期盼；\n3. 生态环境：打赢蓝天保卫战、推行垃圾分类，回应群众对优美生态环境的需求；\n4. 基层治理："接诉即办"机制让群众诉求有了快速响应通道。\n\n三、作为公务员的践行：\n1. 树立为民情怀：时刻把群众冷暖放在心上；\n2. 提升服务本领：不断学习业务知识；\n3. 深入基层一线：多到群众中去了解真实需求；\n4. 勇于担当作为：面对群众急难愁盼问题不推诿、不敷衍。\n\n四、总结：\n"民之所望，政之所向"。作为公职人员，把这句话内化于心、外化于行，在平凡的岗位上做出让群众满意的成绩。'},
+      {id:'default_5',category:CATEGORIES[1],question:'"功成不必在我，功成必定有我"，请谈谈你对这句话的理解。',answer:'【参考答题思路】\n\n一、阐释含义：\n"功成不必在我"体现的是胸怀和境界——不计较个人得失，甘于做铺垫性、基础性的工作；"功成必定有我"体现的是担当和责任——每个人都应该主动作为、贡献力量。\n\n二、两者关系：\n辩证统一。"不必在我"讲的是格局，"必定有我"讲的是担当。前者克服急功近利，后者拒绝袖手旁观。\n\n三、结合工作实际：\n1. 基层工作很多是"前人栽树后人乘凉"——不能因为见效慢就不去做；\n2. 作为年轻干部，既要有"功成不必在我"的定力，也要有"功成必定有我"的拼劲。\n\n四、举例：\n塞罕坝三代人用60年把荒漠变林海——第一代人可能看不到成果，但正是这种精神支撑他们坚持。\n\n五、总结：\n要树立正确的政绩观，既不能急功近利搞形象工程，也不能消极等待，而应以"功成不必在我"的境界和"功成必定有我"的担当做好本职工作。'},
+      {id:'default_6',category:CATEGORIES[2],question:'你是新入职的公务员，老同事总是把琐碎的工作交给你，导致你自己的本职工作进度受到影响，你怎么办？',answer:'【参考答题思路】\n\n一、表明态度：\n作为新人，帮老同事做辅助性工作本身是融入团队、学习业务的好机会，但如果影响本职工作，就需要妥善沟通处理。\n\n二、处理原则：\n尊重老同事、积极沟通、合理拒绝、本职工作优先。\n\n三、具体做法：\n1. 反思自身：检查是否效率低导致做不完，有则先提升效率；\n2. 积极沟通：在合适时机诚恳与老同事沟通，说明自己手头任务紧张；\n3. 善用领导：如果沟通无效，向领导委婉反映，重点放在"如何更好地安排工作"；\n4. 学会说"不"：对明显不合理要求，温和而坚定地拒绝；\n5. 主动融入：积极参加集体活动，建立良好同事关系。\n\n四、总结：\n职场新人既要有谦虚好学的姿态，也要有维护自身工作边界的能力，用沟通化解矛盾，用能力赢得尊重。'},
+      {id:'default_7',category:CATEGORIES[2],question:'领导安排你和一位与你有矛盾的同事共同完成一项任务，你会如何处理？',answer:'【参考答题思路】\n\n一、表明态度：\n工作是工作，个人情绪不能影响任务完成。这是对我大局意识和协作能力的考验。\n\n二、处理步骤：\n1. 调整心态：反思矛盾根源，如果我有不对主动道歉；\n2. 主动破冰：找合适机会与同事坦诚沟通；\n3. 明确分工：根据各自特长合理分配并用书面确认；\n4. 过程协作：定期沟通进度，遇到问题共同商量；\n5. 功劳共享：任务完成后在领导面前肯定同事贡献。\n\n三、原则：对事不对人、求同存异、以诚相待。\n\n四、总结：\n职场中不可能和每个人都合得来，但优秀的公务员必须具备与不同人合作的能力。把共同任务作为修复关系的契机，反而可能化矛盾为友谊。'},
+      {id:'default_8',category:CATEGORIES[3],question:'你在窗口服务时，一位群众因等待时间过长突然情绪激动大声吵闹，引起其他群众围观，你怎么办？',answer:'【参考答题思路】\n\n一、处理原则：\n以人为本、稳定局面、快速处置、恢复秩序。\n\n二、具体步骤：\n1. 立即安抚：停下手中工作起身面对群众，先共情再解决问题："非常抱歉让您久等了，我能理解您的心情"；\n2. 隔离现场：请同事帮忙引导群众到旁边接待室，避免影响窗口秩序；\n3. 了解诉求：耐心倾听不打断不辩解，快速判断问题关键点；\n4. 高效解决：能处理的当场快速办理并解释原因，超出权限立即请示领导给出明确时间表；\n5. 后续跟进：留下联系方式让群众安心；\n6. 复盘改进：事后反思流程优化建议。\n\n三、关键点：\n千万不要和群众争辩对错，情绪激动时讲道理无效，先降温再办事。'},
+      {id:'default_9',category:CATEGORIES[3],question:'单位组织的重要会议即将开始，但会场投影设备突然故障，作为会务负责人你怎么办？',answer:'【参考答题思路】\n\n一、处理原则：\n沉着冷静、快速响应、多手准备、确保会议顺利进行。\n\n二、具体步骤：\n1. 立即排查：联系技术人员抢修，确认故障原因和预计修复时间；\n2. 启动预案：立即启用备用设备（便携投影仪等）；\n3. 替代方案：如短时间无法修复，改为分发纸质材料+口头汇报，或共享屏幕；\n4. 沟通协调：及时向领导报告情况和已采取的应对措施；\n5. 安抚与会者：安排工作人员倒水、发放材料，避免冷场；\n6. 事后总结：复盘故障原因，完善设备检查清单和应急预案。\n\n三、教训：\n大型会议必须提前1小时到场检查所有设备，且至少准备一套备用方案，这是会务工作的基本素养。'},
+      {id:'default_10',category:CATEGORIES[4],question:'单位要组织一次"乡村振兴"主题调研活动，领导让你负责，你怎么开展？',answer:'【参考答题思路】\n\n一、明确目标：\n深入了解乡村振兴战略在基层的落实情况、存在的问题和群众的真实需求。\n\n二、前期准备：\n1. 制定方案：明确调研时间、地点（2-3个代表村镇）、人员分组、方式（座谈+走访+问卷）；\n2. 组建团队：抽调业务骨干，邀请相关部门同志参与；\n3. 准备材料：设计调查问卷、访谈提纲，收集当地基本数据；\n4. 对接联络：提前与当地乡镇政府对接。\n\n三、实施阶段：\n1. 召开座谈会：邀请村干部、种植大户、返乡创业青年等代表参加；\n2. 入户走访：随机走访若干农户，了解收入变化、政策享受情况、实际困难；\n3. 实地察看：查看特色产业基地、基础设施建设、公共服务配套；\n4. 做好记录：每日整理调研笔记。\n\n四、后期总结：\n1. 撰写调研报告：基本情况、主要做法、存在问题、对策建议；\n2. 附数据统计和典型案例；\n3. 向领导汇报调研成果，提出可操作建议。\n\n五、注意事项：\n轻车简从不增加基层负担；实事求是，不预设结论；注意收集正反两方面案例。'},
+      {id:'default_11',category:CATEGORIES[4],question:'市里要举办一场面向群众的普法宣传活动，领导交给你组织，你如何策划？',answer:'【参考答题思路】\n\n一、明确目标：\n提高群众法律意识，让民法典、反诈骗等法律知识"飞入寻常百姓家"。\n\n二、前期策划：\n1. 确定主题：如"美好生活·民法典相伴"或"守住钱袋子——防范电信诈骗"；\n2. 创新形式：法律知识有奖问答、模拟法庭情景剧、律师现场咨询、宣传展板+短视频播放；\n3. 选定场地和时间：人流量大的广场或社区活动中心，周末上午；\n4. 协调资源：邀请司法局、律师协会、社区志愿者参与。\n\n三、宣传预热：\n通过社区微信群、公众号、海报提前一周宣传，让群众知道时间地点和活动亮点。\n\n四、现场执行：\n1. 设置签到区和引导牌，安排志愿者引导；\n2. 各区域分工明确：咨询区、展示区、互动区、礼品发放区；\n3. 安排摄影摄像留存资料；\n4. 关注现场安全，做好人流疏导和应急准备。\n\n五、活动总结：\n统计参与人数、咨询问题类型、发放材料数量，收集群众反馈，撰写活动简报。'},
+      {id:'default_12',category:CATEGORIES[5],question:'你是社区工作人员，一位大爷因为邻居养狗扰民问题到社区投诉，请你现场模拟如何与大爷沟通。',answer:'【现场模拟】\n\n工作人员："大爷，您先坐下喝口水，别着急，慢慢说。"\n\n（大爷坐下后）\n\n工作人员："大爷，您能跟我说说具体是什么情况吗？是哪家邻居的狗？怎么个扰民法？"\n\n大爷："就是楼上302那家！养了条大狗，半夜叫个不停，我和老伴根本睡不好觉！"\n\n工作人员："我理解了，睡眠不好确实影响身体，换我也受不了。大爷您放心，这件事我们社区一定管。您最近有没有跟302的住户沟通过这个事？"\n\n大爷："说过一次，人家嘴上说注意注意，结果还是老样子！"\n\n工作人员："好的大爷，您反映的情况我记下来了。这样，我接下来做三件事：第一，我今天就去302上门了解情况；第二，我会跟302住户好好沟通；第三，如果他们确实不听劝导，我们社区可以协调派出所民警一起上门。您看这样可以吗？"\n\n大爷："那行，你可得抓紧办啊！"\n\n工作人员："大爷您放心，我这一两天就给您回话。这是我的电话，您记一下，以后有什么事随时找我。"\n\n【思路总结】\n1. 先安抚情绪表达共情；2. 详细了解情况；3. 给出明确的行动承诺和时间表；4. 留下联系方式让群众安心。'},
+      {id:'default_13',category:CATEGORIES[5],question:'你是单位扶贫干部，一位贫困户认为扶贫政策对自己不公平，情绪激动来找你理论，请现场模拟你如何安抚并解释。',answer:'【现场模拟】\n\n扶贫干部："老张，你来了！来来来，先坐。我看你脸色不太好，是不是遇到什么难事了？"\n\n老张："我问你，为啥隔壁老李家能享受低保，我家就不行？我们都是贫困户，凭啥不一样？你们这是欺负人！"\n\n扶贫干部："老张，你说得对，换我看到邻居享受政策我没享受到，心里也会不平衡。你先别急，我当着你的面把政策文件拿出来，咱们一条一条对，看看到底是什么原因，好不好？"\n\n（拿出文件，耐心解释低保认定标准——家庭人均月收入低于XX元且家庭财产符合规定）\n\n扶贫干部："老张，你儿子在外打工收入不稳定这个情况，我们可以重新核算。另外，虽然暂时不符合低保条件，但我们的产业扶贫政策你都能享受——上次说的养殖补贴，还有技术培训，这些我帮你盯着，让你靠自己本事稳定增收，比吃低保强多了是不是？"\n\n老张："那……那你帮我重新算算。还有那个养殖补贴，真能办下来？"\n\n扶贫干部："包在我身上！我今天就帮你填表，明天送到镇上去。老张你放心，扶贫政策是帮真正困难的人，绝不会让老实人吃亏。有消息我第一时间通知你。"\n\n【思路总结】\n1. 共情先行，不急于辩解；2. 摆政策、摆数据，用事实说话；3. 给出解决路径，不只说"不行"还要说"怎么做才行"；4. 让群众看到希望。'},
+      {id:'default_14',category:CATEGORIES[6],question:'请用"担当、创新、奉献"三个词串成一段话，谈谈你对公务员工作的理解。',answer:'【参考答题】\n\n如果让我用这三个词来描述我心中的公务员工作：\n\n公务员首先需要有"担当"——这不是一份朝九晚五的普通职业，而是一份沉甸甸的责任。当群众遇到难事找到你，你不能说"这不归我管"就推出去；当急难险重任务来临时，你必须冲得上去、扛得下来。担当是公务员的底色。\n\n但光有担当还不够，新时代的公务员还需要"创新"。脱贫攻坚中涌现出多少因地制宜的好做法？数字化政务让多少群众少跑了冤枉路？创新不是标新立异，而是用更有效的方法解决老问题，用更便民的思路优化旧流程。\n\n而这一切的背后，是"奉献"精神在支撑。基层公务员加班加点、节假日值守、在田间地头和群众打成一片——没有奉献精神的人干不了这行。奉献不是不计报酬的牺牲，而是一种因热爱而投入、因责任而坚守的职业态度。\n\n所以我理解，公务员工作就是在平凡岗位上，以担当的姿态面对责任，以创新的思维破解难题，以奉献的精神服务人民。三个词合在一起，就是一个合格公务员应有的模样。'},
+      {id:'default_15',category:CATEGORIES[6],question:'（漫画题）画面上一个人站在岔路口，一条路写着"安逸"，一条路写着"奋斗"，请谈谈你的认识。',answer:'【参考答题思路】\n\n一、描述漫画：\n画面中一个人站在人生的岔路口，左边标着"安逸"，道路平坦但一眼望得到头；右边标着"奋斗"，道路崎岖但通向远方。\n\n二、揭示寓意：\n核心矛盾是"舒适区"与"成长区"的抉择。\n\n三、深入分析：\n1. "安逸"的诱惑与代价：短期舒服，长期带来能力停滞，温水煮青蛙；\n2. "奋斗"的艰辛与回报：过程辛苦，但带来成长和眼界跃升，如同登山——过程艰难但山顶风景不同；\n3. 辩证看待：安逸不等于堕落，适度调整是必要的；奋斗也不等于盲目内卷，有方向有方法的努力才有意义。\n\n四、结合公务员考试：\n选择考公本身就是选择了一条"奋斗"之路。我们放弃安逸，选择去基层、去一线、去群众需要的地方，不是因为安逸不好，而是因为用奋斗书写的人生更有分量。\n\n五、总结：\n岔路口的每一次选择都在定义我们成为什么样的人。我愿选择"奋斗"，因为唯有攀登，方能望远。'}
+    ];
   }
-}
 
-function buildCategory() {
-  const cats = new Set();
-  rawData.forEach((item) => {
-    if (item.category) cats.add(item.category);
-  });
-  const bar = document.getElementById("categoryBar");
-  const allBtn = bar.querySelector('[data-cat="all"]');
-  bar.innerHTML = "";
-  bar.appendChild(allBtn);
-  cats.forEach((c) => {
-    const btn = document.createElement("button");
-    btn.className = "category-btn";
-    btn.dataset.cat = c;
-    btn.innerText = c;
-    btn.addEventListener("click", () => {
-      currentCat = c;
-      setActiveCat();
-      renderList();
+  function loadQuestions() {
+    try { var s = localStorage.getItem(SK_Q); if (s) { var p = JSON.parse(s); if (Array.isArray(p)) return p; } } catch (e) {} if (syncEnabled && syncUrl) { fetch(syncUrl + '/questions.json').then(function(r) { return r.json(); }).then(function(data) { if (Array.isArray(data) && data.length > 0) { questions = data; saveQuestionsLocal(data); renderSidebar(); renderQuestions(); updateHeader(); } }).catch(function(){}); }
+    var d = getDefaultQuestions(); saveQuestions(d); return d;
+  }
+  function saveQuestions(d) { try { localStorage.setItem(SK_Q, JSON.stringify(d)); } catch (e) { showToast('存储空间不足，请清理数据或图片'); } if (syncEnabled && syncUrl) { fetch(syncUrl + '/questions.json', { method: 'PUT', body: JSON.stringify(d) }).catch(function(){}); } }
+  function loadNote(id) { try { return localStorage.getItem(SK_N + id) || ''; } catch (e) { return ''; } }
+  function loadNoteCloud(id, cb) { if (!syncEnabled || !syncUrl) return; fetch(syncUrl + '/notes/' + encodeURIComponent(id) + '.json').then(function(r) { return r.json(); }).then(function(v) { if (v !== null && v !== undefined) { var local = loadNote(id); if (v !== local) { saveNote(id, v, true); if (cb) cb(v); } else if (cb) cb(local); } }).catch(function(){}); }
+  function syncQuestionsFromCloud() { if (!syncEnabled || !syncUrl) return; fetch(syncUrl + '/questions.json').then(function(r) { return r.json(); }).then(function(data) { if (Array.isArray(data) && data.length > 0) { var local = JSON.stringify(questions); if (JSON.stringify(data) !== local) { questions = data; saveQuestionsLocal(data); renderSidebar(); renderQuestions(); } } }).catch(function(){}); }
+  function saveQuestionsLocal(d) { try { localStorage.setItem(SK_Q, JSON.stringify(d)); } catch(e) {} }
+  function syncAllFromCloud() { if (!syncEnabled || !syncUrl) return; var f = questions; f.forEach(function(q) { loadNoteCloud(q.id, function(v) { var el = document.getElementById('note_' + q.id); if (el && el.value !== v && !el.dataset.touched) el.value = v; }); }); }
+  function saveNote(id, v, skipCloud) { try { localStorage.setItem(SK_N + id, v); } catch (e) {} if (!skipCloud && syncEnabled && syncUrl) { fetch(syncUrl + '/notes/' + encodeURIComponent(id) + '.json', { method: 'PUT', body: JSON.stringify(v) }).catch(function(){}); } }
+  function loadDarkMode() { try { return localStorage.getItem(SK_D) === 'true'; } catch (e) { return false; } }
+  function saveDarkMode(v) { try { localStorage.setItem(SK_D, v ? 'true' : 'false'); } catch (e) {} }
+  function loadCategory() { try { return localStorage.getItem(SK_C) || null; } catch (e) { return null; } }
+  function saveCategory(c) { try { if (c) localStorage.setItem(SK_C, c); else localStorage.removeItem(SK_C); } catch (e) {} }
+  function genId() { return 'q_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9); }
+
+  var questions = [], currentCategory = null, searchQuery = '', editingId = null, pendingDel = null, darkMode = false, noteTimers = {};
+  var syncUrl = '', syncEnabled = false;
+
+  function showToast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(function() { t.classList.remove('show'); }, 2000); }
+  function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+  function loadSyncUrl() { try { return localStorage.getItem('interview_bank_sync_url') || ''; } catch(e) { return ''; } }
+  function saveSyncUrl(url) { try { localStorage.setItem('interview_bank_sync_url', url); } catch(e) {} }
+  function initSync() { syncUrl = loadSyncUrl(); if (syncUrl) { syncEnabled = true; updateSyncUI(); syncAllFromCloud(); } else { updateSyncUI(); } }
+  function updateSyncUI() { var btn = document.getElementById('syncLabel'); if (!btn) return; if (syncEnabled) { btn.innerHTML = '\u2601\uFE0F \u5DF2\u540C\u6B65'; testSyncReachability(); } else { btn.innerHTML = '\u2601\uFE0F \u4E91\u540C\u6B65\uFF08\u70B9\u51FB\u914D\u7F6E\uFF09'; } }
+  function syncNow() { if (syncEnabled) { syncAllFromCloud(); showToast('\u6B63\u5728\u540C\u6B65…'); testSyncReachability(); } }
+  function checkStorageQuota() { try { var used = JSON.stringify(localStorage).length; var limit = 5242880; if (used > limit * 0.8) { showToast('存储空间不足(已用' + Math.round(used/1024) + 'KB)，建议清理图片'); } } catch(e) {} }
+  function testSyncReachability() { if (!syncUrl) return; var lb = document.getElementById('syncLabel'); fetch(syncUrl + '/.json').then(function(r) { if (lb) lb.innerHTML = r.ok ? '\u2601\uFE0F \u5DF2\u540C\u6B65' : '\u2601\uFE0F \u8FDE\u63A5\u5931\u8D25(' + r.status + ')'; }).catch(function() { if (lb) lb.innerHTML = '\u2601\uFE0F \u65E0\u6CD5\u8FDE\u63A5'; }); }
+
+  function applyDarkMode(v) {
+    darkMode = v;
+    if (v) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark');
+    var icon = document.getElementById('darkIcon'), label = document.getElementById('darkModeLabel');
+    if (v) { icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>'; label.textContent = '护眼模式'; }
+    else { icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>'; label.textContent = '暗黑模式'; }
+    saveDarkMode(v);
+  }
+  function toggleDarkMode() { applyDarkMode(!darkMode); }
+
+  function toggleSidebar() { var s = document.getElementById('sidebar'), b = document.getElementById('sidebarBackdrop'); if (s.classList.contains('open')) closeSidebar(); else { s.classList.add('open'); b.classList.add('active'); } }
+  function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarBackdrop').classList.remove('active'); }
+
+  function escHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  function escAttr(s) { return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  function renderSidebar() {
+    var list = document.getElementById('categoryList'), counts = {};
+    questions.forEach(function(q) { counts[q.category] = (counts[q.category] || 0) + 1; });
+    var h = '<button onclick="selectCategory(null)" class="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors flex items-center justify-between ' + (currentCategory === null ? 'bg-white/15 text-white font-medium' : 'text-white/70 hover:bg-white/8 hover:text-white') + '"><span>\u{1F4CB} 全部题目</span><span class="text-xs ' + (currentCategory === null ? 'text-white/70' : 'text-white/40') + '">' + questions.length + '</span></button>';
+    CATEGORIES.forEach(function(c) {
+      var n = counts[c] || 0, act = currentCategory === c;
+      h += '<button onclick="selectCategory(\'' + escAttr(c) + '\')" class="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors flex items-center justify-between ' + (act ? 'bg-white/15 text-white font-medium' : 'text-white/70 hover:bg-white/8 hover:text-white') + '"><span>' + escHtml(c) + '</span><span class="text-xs ' + (act ? 'text-white/70' : 'text-white/40') + '">' + n + '</span></button>';
     });
-    bar.appendChild(btn);
-  });
-  setActiveCat();
-}
-
-function setActiveCat() {
-  document.querySelectorAll(".category-btn").forEach((btn) => {
-    if (btn.dataset.cat === currentCat) {
-      btn.classList.add("active");
-    } else {
-      btn.classList.remove("active");
-    }
-  });
-}
-
-function renderList() {
-  const keyword = document.getElementById("search").value.trim().toLowerCase();
-  let filtered = rawData;
-
-  if (currentCat !== "all") {
-    filtered = filtered.filter((item) => item.category === currentCat);
-  }
-  if (keyword) {
-    filtered = filtered.filter((item) =>
-      (item.q || "").toLowerCase().includes(keyword)
-    );
+    list.innerHTML = h;
   }
 
-  const container = document.getElementById("list");
-  container.innerHTML = "";
+  function selectCategory(c) { currentCategory = c; saveCategory(c); closeSidebar(); renderSidebar(); renderQuestions(); updateHeader(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  function handleSearch(v) { searchQuery = v.trim(); renderQuestions(); updateHeader(); }
 
-  filtered.forEach((item, idx) => {
-    const div = document.createElement("div");
-    div.className = "item";
+  function getFiltered() {
+    var f = questions;
+    if (currentCategory) f = f.filter(function(q) { return q.category === currentCategory; });
+    if (searchQuery) { var q = searchQuery.toLowerCase(); f = f.filter(function(i) { return i.question.toLowerCase().indexOf(q) !== -1 || i.category.toLowerCase().indexOf(q) !== -1; }); }
+    return f;
+  }
 
-    const qDiv = document.createElement("div");
-    qDiv.className = "q";
-    qDiv.innerText = (idx + 1) + ". " + (item.q || "无题目");
+  function updateHeader() {
+    var t = document.getElementById('currentCategoryTitle'), c = document.getElementById('questionCount'), f = getFiltered();
+    if (searchQuery) { t.textContent = '搜索结果'; c.textContent = '\u627E\u5230 ' + f.length + ' \u9053\u76F8\u5173\u9898\u76EE'; }
+    else if (currentCategory) { t.textContent = currentCategory; c.textContent = '\u5171 ' + f.length + ' \u9053\u9898\u76EE'; }
+    else { t.textContent = '\u5168\u90E8\u9898\u76EE'; c.textContent = '\u5171 ' + f.length + ' \u9053\u9898\u76EE'; }
+  }
 
-    const aDiv = document.createElement("div");
-    aDiv.className = "a";
-    aDiv.innerText = item.a || "暂无答案";
-
-    qDiv.addEventListener("click", () => {
-      aDiv.style.display = aDiv.style.display === "none" ? "block" : "none";
+  function renderQuestions() {
+    var container = document.getElementById('questionList'), empty = document.getElementById('emptyState'), f = getFiltered();
+    updateHeader();
+    if (f.length === 0) { container.innerHTML = ''; empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+    container.innerHTML = f.map(function(q) { return renderCard(q); }).join('');
+    f.forEach(function(q) {
+      var ne = document.getElementById('note_' + q.id);
+      if (ne) { ne.value = loadNote(q.id); ne.addEventListener('input', function() { if (!this.dataset.touched) this.dataset.touched = '1'; handleNoteInput(q.id, this.value); }); }
     });
+  }
 
-    div.appendChild(qDiv);
-    div.appendChild(aDiv);
-    container.appendChild(div);
-  });
-}
+  function renderCard(q) {
+    var ci = CATEGORIES.indexOf(q.category);
+    var cls = ['bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300','bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300','bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300','bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300','bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300','bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300','bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300'];
+    var cc = cls[ci] || cls[0];
+    var h = '<div class="question-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden" id="card_' + q.id + '">';
+    h += '<div class="px-5 md:px-6 pt-5 pb-3"><div class="flex items-start justify-between gap-3 mb-3"><span class="inline-block px-2.5 py-1 text-xs font-medium rounded-md ' + cc + ' whitespace-nowrap shrink-0">' + escHtml(q.category) + '</span><div class="flex items-center gap-1 shrink-0"><button onclick="openEditModal(\'' + q.id + '\')" title="\u7F16\u8F91" class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button onclick="confirmDelete(\'' + q.id + '\')" title="\u5220\u9664" class="p-1.5 rounded-md hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors text-gray-400 hover:text-red-500 dark:hover:text-red-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div></div><p class="text-gray-800 dark:text-gray-100 leading-relaxed text-[15px]">' + escHtml(q.question) + '</p>' + (q.image ? '<img src="' + escAttr(q.image) + '" alt="题目图片" class="mt-3 rounded-lg max-w-full max-h-72 object-contain border border-gray-200 dark:border-gray-600" onerror="this.style.display=\'none\'">' : '') + '</div>';
+    h += '<div class="px-5 md:px-6 border-t border-gray-100 dark:border-gray-700/50"><button onclick="toggleAnswer(\'' + q.id + '\')" class="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-navy-700 dark:text-blue-400 hover:text-navy-900 dark:hover:text-blue-300 transition-colors group"><span id="answerBtnText_' + q.id + '">\u70B9\u51FB\u67E5\u770B\u53C2\u8003\u7B54\u6848</span><svg id="answerBtnIcon_' + q.id + '" class="w-4 h-4 transition-transform duration-300 group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button><div id="answerBody_' + q.id + '" class="answer-body border-t border-gray-100 dark:border-gray-700/50"><div class="flex items-center justify-between mb-3"><span class="text-xs font-medium text-gray-500 dark:text-gray-400">\u{1F4DD} \u53C2\u8003\u7B54\u6848</span><button onclick="copyAnswer(\'' + q.id + '\')" class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-navy-700 dark:hover:text-blue-400 transition-colors px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>\u590D\u5236</button></div><div id="answerContent_' + q.id + '" class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">' + escHtml(q.answer || '\u6682\u65E0\u53C2\u8003\u7B54\u6848') + '</div></div></div>';
+    h += '<div class="px-5 md:px-6 pb-5 pt-3 border-t border-gray-100 dark:border-gray-700/50"><div class="flex items-center gap-2 mb-2"><svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg><span class="text-xs font-medium text-gray-500 dark:text-gray-400">\u4E2A\u4EBA\u7B14\u8BB0\uFF08\u81EA\u52A8\u4FDD\u5B58\uFF09</span></div><textarea id="note_' + q.id + '" rows="2" placeholder="\u5728\u8FD9\u91CC\u5199\u5907\u8003\u5FC3\u5F97\u3001\u7B54\u9898\u8BDD\u672F\u3001\u4EAE\u70B9\u91D1\u53E5\u2026" class="note-textarea w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:border-navy-400 dark:focus:border-blue-500 focus:ring-1 focus:ring-navy-400 dark:focus:ring-blue-500"></textarea></div></div>';
+    return h;
+  }
 
-document.getElementById("search").addEventListener("input", renderList);
+  function toggleAnswer(id) {
+    var body = document.getElementById('answerBody_' + id), bt = document.getElementById('answerBtnText_' + id), bi = document.getElementById('answerBtnIcon_' + id);
+    if (body.classList.contains('open')) { body.classList.remove('open'); bt.textContent = '\u70B9\u51FB\u67E5\u770B\u53C2\u8003\u7B54\u6848'; bi.style.transform = 'rotate(0deg)'; }
+    else { body.classList.add('open'); bt.textContent = '\u6536\u8D77\u53C2\u8003\u7B54\u6848'; bi.style.transform = 'rotate(180deg)'; }
+  }
 
-loadData();
+  function copyAnswer(id) {
+    var txt = document.getElementById('answerContent_' + id).textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(function() { showToast('\u2705 \u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F'); }); }
+    else { var ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); showToast('\u2705 \u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F'); } catch (e) { showToast('\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9\u6587\u5B57'); } document.body.removeChild(ta); }
+  }
+
+  function handleNoteInput(qid, v) { clearTimeout(noteTimers[qid]); noteTimers[qid] = setTimeout(function() { saveNote(qid, v); }, 800); }
+
+  function populateCategorySelect() { var s = document.getElementById('formCategory'); s.innerHTML = '<option value="">\u8BF7\u9009\u62E9\u9898\u578B\u5206\u7C7B</option>' + CATEGORIES.map(function(c) { return '<option value="' + escAttr(c) + '">' + escHtml(c) + '</option>'; }).join(''); }
+
+  function openAddModal() { editingId = null; document.getElementById('modalTitle').textContent = '\u65B0\u589E\u9898\u76EE'; document.getElementById('editQuestionId').value = ''; document.getElementById('formCategory').value = ''; document.getElementById('formQuestion').value = ''; document.getElementById('formAnswer').value = ''; document.getElementById('formImage').value = ''; clearImage(); document.getElementById('questionModal').classList.add('active'); attachPaste(); }
+
+  function openEditModal(id) { var q = questions.find(function(x) { return x.id === id; }); if (!q) return; editingId = id; document.getElementById('modalTitle').textContent = '\u7F16\u8F91\u9898\u76EE'; document.getElementById('editQuestionId').value = id; document.getElementById('formCategory').value = q.category; document.getElementById('formQuestion').value = q.question; document.getElementById('formAnswer').value = q.answer || ''; document.getElementById('formImage').value = q.image || ''; if (q.image) { setImagePreview(q.image); } else { clearImage(); } document.getElementById('questionModal').classList.add('active'); }
+
+  function closeModal() { document.getElementById('questionModal').classList.remove('active'); detachPaste(); clearImage(); }
+  function closeModalOutside(e) { if (e.target === document.getElementById('questionModal')) closeModal(); }
+
+  function handleFormSubmit(e) {
+    e.preventDefault();
+    var cat = document.getElementById('formCategory').value, qtxt = document.getElementById('formQuestion').value.trim(), atxt = document.getElementById('formAnswer').value.trim(), img = document.getElementById('formImage').value.trim();
+    if (!cat) { showToast('\u8BF7\u9009\u62E9\u9898\u578B\u5206\u7C7B'); return; }
+    if (!qtxt) { showToast('\u8BF7\u8F93\u5165\u9762\u8BD5\u9898\u5E72'); return; }
+    if (editingId) { var i = questions.findIndex(function(x) { return x.id === editingId; }); if (i !== -1) { questions[i].category = cat; questions[i].question = qtxt; questions[i].answer = atxt; questions[i].image = img; } showToast('\u9898\u76EE\u5DF2\u66F4\u65B0'); }
+    else { questions.push({ id: genId(), category: cat, question: qtxt, answer: atxt }); showToast('\u9898\u76EE\u5DF2\u6DFB\u52A0'); }
+    saveQuestions(questions); closeModal(); renderSidebar(); renderQuestions();
+  }
+
+  function confirmDelete(id) { pendingDel = id; var d = document.getElementById('confirmDialog'); d.classList.remove('hidden'); d.classList.add('flex'); document.getElementById('confirmDeleteBtn').onclick = function() { executeDelete(); }; }
+  function closeConfirmDialog() { pendingDel = null; var d = document.getElementById('confirmDialog'); d.classList.add('hidden'); d.classList.remove('flex'); }
+  function executeDelete() { if (!pendingDel) return; questions = questions.filter(function(q) { return q.id !== pendingDel; }); try { localStorage.removeItem(SK_N + pendingDel); } catch (e) {} saveQuestions(questions); closeConfirmDialog(); renderSidebar(); renderQuestions(); showToast('\u9898\u76EE\u5DF2\u5220\u9664'); }
+
+  function handleBackToTop() { var b = document.getElementById('backToTop'); if (window.scrollY > 400) b.classList.add('visible'); else b.classList.remove('visible'); }
+  function handleKeyboard(e) { if (e.key === 'Escape') { if (!document.getElementById('confirmDialog').classList.contains('hidden')) closeConfirmDialog(); else if (document.getElementById('questionModal').classList.contains('active')) closeModal(); } }
+
+  function init() {
+    questions = loadQuestions();
+    darkMode = loadDarkMode(); applyDarkMode(darkMode);
+    currentCategory = loadCategory();
+    if (currentCategory && CATEGORIES.indexOf(currentCategory) === -1) currentCategory = null;
+    populateCategorySelect();
+    renderSidebar(); renderQuestions(); updateHeader();
+    window.addEventListener('scroll', handleBackToTop, { passive: true });
+    document.addEventListener('keydown', handleKeyboard);
+    handleBackToTop();
+    initSync();
+    checkStorageQuota();
+    if (syncEnabled) setInterval(syncNow, 30000);
+        document.getElementById('confirmDialog').addEventListener('click', function(e) { if (e.target === this) closeConfirmDialog(); });
+  }
+
+  function openSyncModal() { var url = loadSyncUrl(); var input = document.getElementById('syncUrlInput'); if (input && url) input.value = url; document.getElementById('syncModal').classList.add('active'); }
+  function closeSyncModal() { document.getElementById('syncModal').classList.remove('active'); }
+  function closeSyncModalOutside(e) { if (e.target === document.getElementById('syncModal')) closeSyncModal(); }
+  function saveSyncConfig() { var url = document.getElementById('syncUrlInput').value.trim(); if (!url) { showToast('请输入数据库 URL'); return; } if (url.indexOf('firebasedatabase.app') === -1) { showToast('URL 格式不正确，请检查'); return; } saveSyncUrl(url); syncUrl = url; syncEnabled = true; updateSyncUI(); closeSyncModal(); showToast('云同步已启用'); syncAllFromCloud(); }
+  function disableSync() { saveSyncUrl(''); syncUrl = ''; syncEnabled = false; updateSyncUI(); closeSyncModal(); showToast('云同步已关闭'); }
+  function handleImageFile(input) { var f = input.files[0]; if (!f) return; var reader = new FileReader(); reader.onload = function(e) { setImagePreview(e.target.result); }; reader.readAsDataURL(f); }
+  function setImagePreview(dataUrl) { document.getElementById('formImage').value = dataUrl; document.getElementById('imagePreviewImg').src = dataUrl; document.getElementById('imagePreview').classList.remove('hidden'); document.getElementById('imagePlaceholder').classList.add('hidden'); document.getElementById('clearImageBtn').classList.remove('hidden'); }
+  function clearImage() { document.getElementById('formImage').value = ''; document.getElementById('imagePreview').classList.add('hidden'); document.getElementById('imagePlaceholder').classList.remove('hidden'); document.getElementById('clearImageBtn').classList.add('hidden'); document.getElementById('formImageFile').value = ''; }
+  var _pasteHandler = null;
+  function attachPaste() { if (_pasteHandler) return; _pasteHandler = function(e) { if (!document.getElementById('questionModal').classList.contains('active')) return; var items = e.clipboardData.items; for (var i = 0; i < items.length; i++) { if (items[i].type.indexOf('image') !== -1) { e.preventDefault(); var blob = items[i].getAsFile(); var reader = new FileReader(); reader.onload = function(ev) { setImagePreview(ev.target.result); }; reader.readAsDataURL(blob); break; } } }; document.addEventListener('paste', _pasteHandler); }
+  function detachPaste() { if (_pasteHandler) { document.removeEventListener('paste', _pasteHandler); _pasteHandler = null; } }
+  function handleSyncClick() { if (syncEnabled) { syncNow(); } else { openSyncModal(); } }
+  function testSyncConnection() { var url = document.getElementById('syncUrlInput').value.trim(); var el = document.getElementById('syncTestResult'); if (!url) { el.textContent = '请输入 URL'; el.className = 'text-xs text-red-500'; return; } el.textContent = '测试中…'; el.className = 'text-xs text-blue-500'; fetch(url + '/.json').then(function(r) { if (r.ok) { el.textContent = '✓ 连接成功'; el.className = 'text-xs text-green-500'; } else { el.textContent = '✗ 连接失败 (' + r.status + ')'; el.className = 'text-xs text-red-500'; } }).catch(function(e) { el.textContent = '✗ 连接失败: ' + e.message; el.className = 'text-xs text-red-500'; }); }
+
+  function openBatchImportModal() { populateBatchCategory(); document.getElementById('batchImportModal').classList.add('active'); }
+  function closeBatchImportModal() { document.getElementById('batchImportModal').classList.remove('active'); }
+  function closeBatchImportOutside(e) { if (e.target === document.getElementById('batchImportModal')) closeBatchImportModal(); }
+  function populateBatchCategory() { var s = document.getElementById('batchCategory'); s.innerHTML = '<option value="">请选择分类</option>' + CATEGORIES.map(function(c) { return '<option value="' + escAttr(c) + '">' + escHtml(c) + '</option>'; }).join(''); }
+  function parseBatchPreview() { var raw = document.getElementById('batchContent').value.trim(); var el = document.getElementById('batchPreview'); if (!raw) { el.textContent = ''; return; } var blocks = raw.split(/\n---\n|\n---$/); var count = 0; blocks.forEach(function(b) { var m = b.match(/Q[：:]\s*(.+)/); if (m && m[1].trim()) count++; }); el.textContent = '识别到 ' + count + ' 道题目'; el.className = count > 0 ? 'text-xs text-green-500 ml-3' : 'text-xs text-red-500 ml-3'; }
+  function executeBatchImport() { var cat = document.getElementById('batchCategory').value; var raw = document.getElementById('batchContent').value.trim(); if (!cat) { showToast('请选择默认分类'); return; } if (!raw) { showToast('请粘贴问答内容'); return; } var blocks = raw.split(/\n---\n|\n---$/); var added = 0; blocks.forEach(function(b) { var qMatch = b.match(/Q[：:]\s*(.+)/); var aMatch = b.match(/A[：:]\s*([\s\S]+)/); var iMatch = b.match(/[IP][：:]\s*(.+)/); var question = qMatch ? qMatch[1].trim() : ''; var answer = aMatch ? aMatch[1].trim() : ''; var image = iMatch ? iMatch[1].trim() : ''; if (question) { questions.push({ id: genId(), category: cat, question: question, answer: answer, image: image }); added++; } }); if (added === 0) { showToast('未识别到有效题目，请检查格式'); return; } saveQuestions(questions); closeBatchImportModal(); renderSidebar(); renderQuestions(); showToast('已导入 ' + added + ' 道题目'); }
+
+  window.selectCategory = selectCategory;
+  window.toggleSidebar = toggleSidebar;
+  window.closeSidebar = closeSidebar;
+  window.toggleAnswer = toggleAnswer;
+  window.copyAnswer = copyAnswer;
+  window.openAddModal = openAddModal;
+  window.openEditModal = openEditModal;
+  window.closeModal = closeModal;
+  window.closeModalOutside = closeModalOutside;
+  window.handleFormSubmit = handleFormSubmit;
+  window.confirmDelete = confirmDelete;
+  window.closeConfirmDialog = closeConfirmDialog;
+  window.handleSearch = handleSearch;
+  window.toggleDarkMode = toggleDarkMode;
+  window.scrollToTop = scrollToTop;
+  window.openSyncModal = openSyncModal;
+  window.closeSyncModal = closeSyncModal;
+  window.closeSyncModalOutside = closeSyncModalOutside;
+  window.saveSyncConfig = saveSyncConfig;
+  window.disableSync = disableSync;
+  window.testSyncConnection = testSyncConnection;
+  window.handleSyncClick = handleSyncClick;
+  window.syncNow = syncNow;
+  window.openBatchImportModal = openBatchImportModal;
+  window.closeBatchImportModal = closeBatchImportModal;
+  window.closeBatchImportOutside = closeBatchImportOutside;
+  window.parseBatchPreview = parseBatchPreview;
+  window.executeBatchImport = executeBatchImport;
+  window.handleImageFile = handleImageFile;
+  window.setImagePreview = setImagePreview;
+  window.clearImage = clearImage;
+  window.attachPaste = attachPaste;
+  window.detachPaste = detachPaste;
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
 </script>
 </body>
 </html>
