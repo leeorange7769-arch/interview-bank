@@ -349,10 +349,10 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
     renderSidebar(); renderQuestions(); updateHeader();
     window.addEventListener('scroll', handleBackToTop, { passive: true });
     document.addEventListener('keydown', handleKeyboard);
-    document.body.addEventListener('click', function(e) { var img = e.target.closest('img[alt="题目图片"]'); if (img) { openLightbox(img.src); } });
     handleBackToTop();
     initSync();
     checkStorageQuota();
+    try { document.getElementById('questionList').addEventListener('click', function(e) { var t = e.target; if (t.tagName === 'IMG' && t.alt === '题目图片') { openLightbox(t.src); } }); } catch(x) {}
         document.getElementById('confirmDialog').addEventListener('click', function(e) { if (e.target === this) closeConfirmDialog(); });
   }
 
