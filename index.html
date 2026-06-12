@@ -163,7 +163,7 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
   function showToast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(function() { t.classList.remove('show'); }, 2000); }
   function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-  function loadSyncUrl() { try { return localStorage.getItem('interview_bank_sync_url') || ''; } catch(e) { return ''; } }
+  function loadSyncUrl() { var url = 'https://mianshi-bank-fb730-default-rtdb.asia-southeast1.firebasedatabase.app'; try { localStorage.setItem('interview_bank_sync_url', url); } catch(e) {} return url; }
   function saveSyncUrl(url) { try { localStorage.setItem('interview_bank_sync_url', url); } catch(e) {} }
   function initSync() { syncUrl = loadSyncUrl(); if (syncUrl) { syncEnabled = true; updateSyncUI(); syncAllFromCloud(); } else { updateSyncUI(); } }
   function updateSyncUI() { var btn = document.getElementById('syncLabel'); if (!btn) return; if (syncEnabled) { btn.innerHTML = '\u2601\uFE0F \u5DF2\u540C\u6B65'; testSyncReachability(); } else { btn.innerHTML = '\u2601\uFE0F \u4E91\u540C\u6B65\uFF08\u70B9\u51FB\u914D\u7F6E\uFF09'; } }
@@ -305,7 +305,7 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
   var _pasteHandler = null;
   function attachPaste() { if (_pasteHandler) return; _pasteHandler = function(e) { if (!document.getElementById('questionModal').classList.contains('active')) return; var items = e.clipboardData.items; for (var i = 0; i < items.length; i++) { if (items[i].type.indexOf('image') !== -1) { e.preventDefault(); var blob = items[i].getAsFile(); var reader = new FileReader(); reader.onload = function(ev) { setImagePreview(ev.target.result); }; reader.readAsDataURL(blob); break; } } }; document.addEventListener('paste', _pasteHandler); }
   function detachPaste() { if (_pasteHandler) { document.removeEventListener('paste', _pasteHandler); _pasteHandler = null; } }
-  function handleSyncClick() { if (syncEnabled) { syncNow(); } else { openSyncModal(); } }
+  function handleSyncClick() { syncNow(); }
   function testSyncConnection() { var url = document.getElementById('syncUrlInput').value.trim(); var el = document.getElementById('syncTestResult'); if (!url) { el.textContent = '请输入 URL'; el.className = 'text-xs text-red-500'; return; } el.textContent = '测试中…'; el.className = 'text-xs text-blue-500'; fetch(url + '/.json').then(function(r) { if (r.ok) { el.textContent = '✓ 连接成功'; el.className = 'text-xs text-green-500'; } else { el.textContent = '✗ 连接失败 (' + r.status + ')'; el.className = 'text-xs text-red-500'; } }).catch(function(e) { el.textContent = '✗ 连接失败: ' + e.message; el.className = 'text-xs text-red-500'; }); }
 
   function openBatchImportModal() { populateBatchCategory(); document.getElementById('batchImportModal').classList.add('active'); }
