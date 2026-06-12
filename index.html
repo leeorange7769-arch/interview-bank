@@ -132,7 +132,7 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
   function saveQuestions(d) { try { localStorage.setItem(SK_Q, JSON.stringify(d)); } catch (e) { showToast('存储空间不足，请清理数据或图片'); } }
   function loadNote(id) { try { return localStorage.getItem(SK_N + id) || ''; } catch (e) { return ''; } }
   function loadNoteCloud(id, cb) { if (!syncEnabled || !syncUrl) return; fetch(syncUrl + '/notes/' + encodeURIComponent(id) + '.json').then(function(r) { return r.json(); }).then(function(v) { if (v !== null && v !== undefined) { var local = loadNote(id); if (v !== local) { saveNote(id, v, true); if (cb) cb(v); } else if (cb) cb(local); } }).catch(function(){}); }
-  function syncAllFromCloud() { if (!syncEnabled || !syncUrl) return; var f = getFiltered(); f.forEach(function(q) { loadNoteCloud(q.id, function(v) { var el = document.getElementById('note_' + q.id); if (el && el.value !== v && !el.dataset.touched) el.value = v; }); }); }
+  function syncAllFromCloud() { if (!syncEnabled || !syncUrl) return; var f = questions; f.forEach(function(q) { loadNoteCloud(q.id, function(v) { var el = document.getElementById('note_' + q.id); if (el && el.value !== v && !el.dataset.touched) el.value = v; }); }); }
   function saveNote(id, v, skipCloud) { try { localStorage.setItem(SK_N + id, v); } catch (e) {} if (!skipCloud && syncEnabled && syncUrl) { fetch(syncUrl + '/notes/' + encodeURIComponent(id) + '.json', { method: 'PUT', body: JSON.stringify(v) }).catch(function(){}); } }
   function loadDarkMode() { try { return localStorage.getItem(SK_D) === 'true'; } catch (e) { return false; } }
   function saveDarkMode(v) { try { localStorage.setItem(SK_D, v ? 'true' : 'false'); } catch (e) {} }
