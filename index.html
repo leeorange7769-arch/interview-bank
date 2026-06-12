@@ -327,8 +327,8 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
 
   function handleFormSubmit(e) { if (e && e.ctrlKey) return; var rawQ = document.getElementById('formQuestion').value; showToast('\u8BFB\u5230: ' + rawQ.substring(0,20)); showToast(editingId ? '\u7F16\u8F91\u4FDD\u5B58\u4E2D...' : '\u65B0\u589E\u4FDD\u5B58\u4E2D...'); 
     e.preventDefault();
-    var qtxt = window._formQValue || document.getElementById('formQuestion').value.trim(); delete window._formQValue;
-    var cat = document.getElementById('formCategory').value, atxt = document.getElementById('formAnswer').value.trim(), img = document.getElementById('formImage').value.trim();
+    var qtxt = window._formQValue || document.getElementById('formQuestion').value; delete window._formQValue;
+    var cat = document.getElementById('formCategory').value, atxt = document.getElementById('formAnswer').value, img = document.getElementById('formImage').value.trim();
     if (!cat) { showToast('\u8BF7\u9009\u62E9\u9898\u578B\u5206\u7C7B'); return; }
     if (!qtxt) { showToast('\u8BF7\u8F93\u5165\u9762\u8BD5\u9898\u5E72'); return; }
     if (editingId) { var i = questions.findIndex(function(x) { return x.id === editingId; }); if (i !== -1) { var updated = { id: editingId, category: cat, question: qtxt, answer: atxt, image: img }; questions.splice(i, 1, updated); showToast('\u2705 \u5DF2\u66F4\u65B0: ' + qtxt.substring(0,15)); } else { showToast('\u66F4\u65B0\u5931\u8D25\uFF1A\u627E\u4E0D\u5230\u9898\u76EEID=' + editingId); } }
