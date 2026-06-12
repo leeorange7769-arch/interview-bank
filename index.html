@@ -126,7 +126,7 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
   }
 
   function loadQuestions() {
-    try { var s = localStorage.getItem(SK_Q); if (s) { var p = JSON.parse(s); if (Array.isArray(p) && p.length > 0) return p; } } catch (e) {}
+    try { var s = localStorage.getItem(SK_Q); if (s) { var p = JSON.parse(s); if (Array.isArray(p)) return p; } } catch (e) {}
     var d = getDefaultQuestions(); saveQuestions(d); return d;
   }
   function saveQuestions(d) { try { localStorage.setItem(SK_Q, JSON.stringify(d)); } catch (e) {} }
