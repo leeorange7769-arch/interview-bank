@@ -344,7 +344,7 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
        saveDeleted(deletedQuestions); } questions = questions.filter(function(q) { return q.id !== pendingDel; }); saveQuestions(questions); closeConfirmDialog(); renderSidebar(); renderQuestions(); showToast('\u9898\u76EE\u5DF2\u5220\u9664'); }
 
   function handleBackToTop() { var b = document.getElementById('backToTop'); if (window.scrollY > 400) b.classList.add('visible'); else b.classList.remove('visible'); }
-  function handleKeyboard(e) { if (e.key === 'Escape') { if (document.getElementById('imageLightbox').classList.contains('active')) { closeLightbox(); return; } if (!document.getElementById('confirmDialog').classList.contains('hidden')) closeConfirmDialog();  } }
+  function handleKeyboard(e) { if (['Control','Meta','Alt','Shift'].indexOf(e.key) !== -1) return; if (e.ctrlKey || e.metaKey || e.altKey) return; if (e.key === 'Escape') { if (document.querySelector('.dyn-lightbox')) { closeLightbox(); return; } if (!document.getElementById('confirmDialog').classList.contains('hidden')) { closeConfirmDialog(); return; } } }
 
   function init() {
     questions = loadQuestions();
