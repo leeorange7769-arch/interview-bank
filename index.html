@@ -341,7 +341,7 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
   function emptyTrash() { if (!confirm('确定清空回收站？此操作不可恢复。')) return; deletedQuestions = []; saveDeleted(deletedQuestions); closeTrashModal(); renderSidebar(); showToast('回收站已清空'); }
   function closeConfirmDialog() { pendingDel = null; var d = document.getElementById('confirmDialog'); d.classList.add('hidden'); d.classList.remove('flex'); }
   function executeDelete() { if (!pendingDel) return; var found = questions.find(function(q) { return q.id === pendingDel; }); if (found) { found.deletedAt = Date.now(); deletedQuestions.push(found);
-       saveDeleted(deletedQuestions); } questions = questions.filter(function(q) { return q.id !== pendingDel; }); saveQuestions(questions); closeConfirmDialog(); renderSidebar(); renderQuestions(); showToast('\u9898\u76EE\u5DF2\u5220\u9664'); }
+       saveDeleted(deletedQuestions); } questions = questions.filter(function(q) { return q.id !== pendingDel; }); saveQuestions(questions); closeConfirmDialog(); renderSidebar(); renderQuestions(); showToast('\u9898\u76EE\u5DF2\u79FB\u5165\u56DE\u6536\u7AD9'); }
 
   function handleBackToTop() { var b = document.getElementById('backToTop'); if (window.scrollY > 400) b.classList.add('visible'); else b.classList.remove('visible'); }
   function handleKeyboard(e) { if (['Control','Meta','Alt','Shift'].indexOf(e.key) !== -1) return; if (e.ctrlKey || e.metaKey || e.altKey) return; if (e.key === 'Escape') { if (document.querySelector('.dyn-lightbox')) { closeLightbox(); return; } if (!document.getElementById('confirmDialog').classList.contains('hidden')) { closeConfirmDialog(); return; } } }
