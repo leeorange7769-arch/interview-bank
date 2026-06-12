@@ -129,14 +129,16 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
   }
 
   function loadQuestions() {
-    try { var s = localStorage.getItem(SK_Q); if (s) { var p = JSON.parse(s); if (Array.isArray(p)) return p; } } catch (e) {} if (syncEnabled && syncUrl) { fetch(syncUrl + '/questions.json').then(function(r) { return r.json(); }).then(function(data) { if (Array.isArray(data) && data.length > 0) { questions = data; saveQuestionsLocal(data); renderSidebar(); renderQuestions(); updateHeader(); } }).catch(function(){}); }
+    // 先尝试读本地缓存作为初始值，异步从云端拉取最新数据
+    try { var s = localStorage.getItem(SK_Q); if (s) { var p = JSON.parse(s); if (Array.isArray(p)) return p; } } catch (e) {}
+    // 本地无数据时返回默认题目
     var d = getDefaultQuestions(); try { localStorage.setItem(SK_Q, JSON.stringify(d)); } catch(e) {} return d;
   }
   function saveQuestions(d) { try { localStorage.setItem(SK_Q, JSON.stringify(d)); } catch (e) { showToast('存储空间不足，请清理数据或图片'); } if (syncEnabled && syncUrl) { fetch(syncUrl + '/questions.json', { method: 'PUT', body: JSON.stringify(d) }).catch(function(){}); } }
   function loadNote(id) { try { return localStorage.getItem(SK_N + id) || ''; } catch (e) { return ''; } }
   function loadNoteCloud(id, cb) { if (!syncEnabled || !syncUrl) return; fetch(syncUrl + '/notes/' + encodeURIComponent(id) + '.json').then(function(r) { return r.json(); }).then(function(v) { if (v !== null && v !== undefined) { var local = loadNote(id); if (v !== local) { saveNote(id, v, true); if (cb) cb(v); } else if (cb) cb(local); } }).catch(function(){}); }
-  function pullQuestionsFromCloud() {
-    if (!syncEnabled || !syncUrl) return;
+  function pullQuestionsFromCloud(cb) {
+    if (!syncEnabled || !syncUrl) { if (cb) cb(); return; }
     fetch(syncUrl + '/questions.json').then(function(r) { return r.json(); }).then(function(data) {
       if (Array.isArray(data) && data.length > 0) {
         questions = data;
@@ -146,11 +148,20 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
       } else {
         showToast('\u4E91\u7AEF\u6682\u65E0\u6570\u636E');
       }
-    }).catch(function() { showToast('\u4E91\u7AEF\u540C\u6B65\u5931\u8D25'); });
+      if (cb) cb();
+    }).catch(function() { showToast('\u4E91\u7AEF\u540C\u6B65\u5931\u8D25'); if (cb) cb(); });
   }
   function syncQuestionsFromCloud() { if (!syncEnabled || !syncUrl) return; fetch(syncUrl + '/questions.json').then(function(r) { return r.json(); }).then(function(data) { if (Array.isArray(data) && data.length > 0) { var local = JSON.stringify(questions); if (JSON.stringify(data) !== local) { questions = data; saveQuestionsLocal(data); renderSidebar(); renderQuestions(); } } }).catch(function(){}); }
   function saveQuestionsLocal(d) { try { localStorage.setItem(SK_Q, JSON.stringify(d)); } catch(e) {} }
-  function syncAllFromCloud() { if (!syncEnabled || !syncUrl) return; var f = questions; var count = 0; f.forEach(function(q) { loadNoteCloud(q.id, function(v) { var el = document.getElementById('note_' + q.id); if (el && el.value !== v && !el.dataset.touched) { el.value = v; count++; } }); if (count > 0) showToast('\u7B14\u8BB0\u540C\u6B65\u5B8C\u6210\uFF1A' + count + ' \u6761'); }); }
+  function syncAllFromCloud() {
+    // 同步题目
+    syncQuestionsFromCloud();
+    // 同步笔记
+    if (!syncEnabled || !syncUrl) return;
+    var f = questions; var count = 0;
+    f.forEach(function(q) { loadNoteCloud(q.id, function(v) { var el = document.getElementById('note_' + q.id); if (el && el.value !== v && !el.dataset.touched) { el.value = v; count++; } }); });
+    if (count > 0) showToast('\u7B14\u8BB0\u540C\u6B65\u5B8C\u6210\uFF1A' + count + ' \u6761');
+  }
   function saveNote(id, v, skipCloud) { try { localStorage.setItem(SK_N + id, v); } catch (e) {} if (!skipCloud && syncEnabled && syncUrl) { fetch(syncUrl + '/notes/' + encodeURIComponent(id) + '.json', { method: 'PUT', body: JSON.stringify(v) }).catch(function(){}); } }
   function loadDarkMode() { try { return localStorage.getItem(SK_D) === 'true'; } catch (e) { return false; } }
   function saveDarkMode(v) { try { localStorage.setItem(SK_D, v ? 'true' : 'false'); } catch (e) {} }
@@ -164,9 +175,46 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
   function showToast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(function() { t.classList.remove('show'); }, 5000); }
   function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-  function loadSyncUrl() { var url = 'https://mianshi-bank-fb730-default-rtdb.asia-southeast1.firebasedatabase.app'; try { localStorage.setItem('interview_bank_sync_url', url); } catch(e) {} return url; }
+  var HARDCODED_SYNC_URL = 'https://mianshi-bank-fb730-default-rtdb.asia-southeast1.firebasedatabase.app';
+  function loadSyncUrl() {
+    // 优先读用户在界面上设置的URL，否则回退到硬编码默认值
+    try {
+      var stored = localStorage.getItem('interview_bank_sync_url');
+      if (stored && stored !== '') return stored;
+    } catch(e) {}
+    // 首次使用：写入硬编码默认值
+    try { localStorage.setItem('interview_bank_sync_url', HARDCODED_SYNC_URL); } catch(e) {}
+    return HARDCODED_SYNC_URL;
+  }
   function saveSyncUrl(url) { try { localStorage.setItem('interview_bank_sync_url', url); } catch(e) {} }
-  function initSync() { syncUrl = loadSyncUrl(); if (syncUrl) { syncEnabled = true; updateSyncUI(); syncAllFromCloud(); } else { updateSyncUI(); } }
+  function initSync() {
+    syncUrl = loadSyncUrl();
+    if (syncUrl) {
+      syncEnabled = true;
+      updateSyncUI();
+      // 启动时强制从云端拉取最新题目（覆盖本地），完成后启动定时器
+      forcePullFromCloud(function() {
+        setInterval(function() { if (syncEnabled) syncQuestionsFromCloud(); }, 30000);
+      });
+    } else {
+      updateSyncUI();
+    }
+  }
+  // 强制从云端拉取并覆盖本地，无论本地是否有缓存
+  function forcePullFromCloud(cb) {
+    if (!syncEnabled || !syncUrl) { if (cb) cb(); return; }
+    fetch(syncUrl + '/questions.json')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (Array.isArray(data) && data.length > 0) {
+          questions = data;
+          try { localStorage.setItem(SK_Q, JSON.stringify(data)); } catch(e) {}
+          renderSidebar(); renderQuestions(); updateHeader();
+        }
+        if (cb) cb();
+      })
+      .catch(function() { if (cb) cb(); });
+  }
   function updateSyncUI() { var btn = document.getElementById('syncLabel'); if (!btn) return; if (syncEnabled) { btn.innerHTML = '\u2601\uFE0F \u5DF2\u540C\u6B65'; testSyncReachability(); } else { btn.innerHTML = '\u2601\uFE0F \u4E91\u540C\u6B65\uFF08\u70B9\u51FB\u914D\u7F6E\uFF09'; } }
   function syncNow() { if (syncEnabled) { syncAllFromCloud(); showToast('\u6B63\u5728\u540C\u6B65…'); testSyncReachability(); } }
   function checkStorageQuota() { try { var used = JSON.stringify(localStorage).length; var limit = 5242880; if (used > limit * 0.8) { showToast('存储空间不足(已用' + Math.round(used/1024) + 'KB)，建议清理图片'); } } catch(e) {} }
@@ -268,7 +316,7 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
     if (!cat) { showToast('\u8BF7\u9009\u62E9\u9898\u578B\u5206\u7C7B'); return; }
     if (!qtxt) { showToast('\u8BF7\u8F93\u5165\u9762\u8BD5\u9898\u5E72'); return; }
     if (editingId) { var i = questions.findIndex(function(x) { return x.id === editingId; }); if (i !== -1) { questions[i].category = cat; questions[i].question = qtxt; questions[i].answer = atxt; questions[i].image = img; } showToast('\u9898\u76EE\u5DF2\u66F4\u65B0'); }
-    else { questions.push({ id: genId(), category: cat, question: qtxt, answer: atxt }); showToast('\u9898\u76EE\u5DF2\u6DFB\u52A0'); }
+    else { questions.push({ id: genId(), category: cat, question: qtxt, answer: atxt, image: img }); showToast('\u9898\u76EE\u5DF2\u6DFB\u52A0'); }
     saveQuestions(questions); closeModal(); renderSidebar(); renderQuestions();
   }
 
@@ -291,7 +339,6 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
     handleBackToTop();
     initSync();
     checkStorageQuota();
-    if (syncEnabled) setInterval(syncNow, 30000);
         document.getElementById('confirmDialog').addEventListener('click', function(e) { if (e.target === this) closeConfirmDialog(); });
   }
 
