@@ -352,7 +352,7 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
     handleBackToTop();
     initSync();
     checkStorageQuota();
-    try { document.getElementById('questionList').addEventListener('click', function(e) { var t = e.target; if (t.tagName === 'IMG' && t.alt === '题目图片') { openLightbox(t.src); } }); } catch(x) {}
+    try { document.getElementById('questionList').addEventListener('click', function(e) { var t = e.target; if (t.tagName === 'IMG' && t.alt === '题目图片') { if (t.tagName === 'IMG' && t.alt === '题目图片') openLightbox(t.src); } }); } catch(x) {}
         document.getElementById('confirmDialog').addEventListener('click', function(e) { if (e.target === this) closeConfirmDialog(); });
   }
 
@@ -405,8 +405,8 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
   window.closeBatchImportModal = closeBatchImportModal;
   window.closeBatchImportOutside = closeBatchImportOutside;
   window.parseBatchPreview = parseBatchPreview;
-  window.openLightbox = function(src) { var lb = document.getElementById('imageLightbox'), li = document.getElementById('lightboxImg'); if (!lb || !li) return; li.src = src; lb.classList.add('active'); };
-  window.closeLightbox = function() { document.getElementById('imageLightbox').classList.remove('active'); };
+  window.openLightbox = function(src) { var ex = document.querySelector('.dyn-lightbox'); if (ex) ex.remove(); var ov = document.createElement('div'); ov.className = 'dyn-lightbox'; ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out'; ov.onclick = function() { ov.remove(); }; var im = document.createElement('img'); im.src = src; im.style.cssText = 'max-width:95vw;max-height:95vh;object-fit:contain;border-radius:4px'; ov.appendChild(im); document.body.appendChild(ov); var esc = function(e) { if (e.key === 'Escape') { ov.remove(); document.removeEventListener('keydown', esc); } }; document.addEventListener('keydown', esc); };
+  window.closeLightbox = function() { var ex = document.querySelector('.dyn-lightbox'); if (ex) ex.remove(); };
   window.verifyAdmin = verifyAdmin;
   window.submitAdmin = submitAdmin;
   window.closeAdminModal = closeAdminModal;
