@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>公务员面试题库 · 个人备考收藏</title>
   <script src="https://cdn.tailwindcss.com">
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
   </script>
   <script>
     tailwind.config = {
@@ -45,6 +47,7 @@
   <nav class="flex-1 overflow-y-auto sidebar-scroll px-3 py-2"><p class="px-3 py-1 text-[11px] text-white/40 uppercase tracking-widest mb-1">题型分类</p><div id="categoryList" class="space-y-0.5"></div></nav>
   <div class="px-4 py-3 border-t border-white/10 space-y-2">
     <button onclick="openAddModal()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>新增题目</button>
+    <button onclick="openSyncModal()" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white/8 hover:bg-white/12 text-white/80 text-sm rounded-lg transition-colors mb-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg><span id="syncLabel">云同步</span></button>
     <button id="darkModeToggle" onclick="toggleDarkMode()" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white/8 hover:bg-white/12 text-white/80 text-sm rounded-lg transition-colors"><svg id="darkIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg><span id="darkModeLabel">暗黑模式</span></button>
   </div>
 </aside>
@@ -79,6 +82,8 @@
   </div>
 </div>
 
+
+<div id="syncModal" class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="closeSyncModalOutside(event)"><div class="modal-panel bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()"><div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><h3 class="text-lg font-bold text-navy-900 dark:text-gray-100">云同步设置</h3><button onclick="closeSyncModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div><div class="px-6 py-5 space-y-4"><div class="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 text-sm text-blue-800 dark:text-blue-200"><p class="font-medium mb-1">如何获取 Firebase 配置？</p><ol class="list-decimal list-inside space-y-1 text-xs"><li>打开 <a href="https://console.firebase.google.com" target="_blank" class="underline">console.firebase.google.com</a> 创建项目</li><li>左侧菜单 → Realtime Database → 创建数据库（选测试模式）</li><li>项目设置 → 您的应用 → 添加 Web 应用</li><li>复制生成的 config 对象，粘贴到下方</li></ol></div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Firebase 配置 JSON</label><textarea id="syncConfigInput" rows="8" placeholder='粘贴 Firebase config 对象（如 {"apiKey":"...","databaseURL":"..."}）' class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm resize-y focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow font-mono text-xs"></textarea><div class="flex items-center justify-between"><button onclick="testFirebaseConnection()" class="px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors">测试连接</button><span id="syncTestResult" class="text-xs"></span></div><div class="flex items-center justify-end gap-3 pt-2"><button onclick="disableSync()" class="px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors">关闭同步</button><button onclick="closeSyncModal()" class="px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">取消</button><button onclick="saveSyncConfig()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">保存并启用</button></div></div></div></div>
 <div id="confirmDialog" class="fixed inset-0 bg-black/50 z-50 items-center justify-center p-4 hidden"><div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-sm p-6"><h3 class="text-lg font-bold text-navy-900 dark:text-gray-100 mb-2">确认删除</h3><p class="text-sm text-gray-600 dark:text-gray-400 mb-6">删除后不可恢复，确定要删除这道题目吗？</p><div class="flex items-center justify-end gap-3"><button onclick="closeConfirmDialog()" class="px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">取消</button><button id="confirmDeleteBtn" class="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white text-sm font-medium rounded-lg transition-colors">确认删除</button></div></div></div>
 
 <script>
@@ -113,7 +118,9 @@
   }
   function saveQuestions(d) { try { localStorage.setItem(SK_Q, JSON.stringify(d)); } catch (e) {} }
   function loadNote(id) { try { return localStorage.getItem(SK_N + id) || ''; } catch (e) { return ''; } }
-  function saveNote(id, v) { try { localStorage.setItem(SK_N + id, v); } catch (e) {} }
+  function loadNoteCloud(id, cb) { if (!firebaseDb) return; firebaseDb.ref('notes/' + id).once('value').then(function(s) { var v = s.val(); if (v !== null && v !== undefined) { var local = loadNote(id); if (v !== local) { saveNote(id, v, true); if (cb) cb(v); } else if (cb) cb(local); } }).catch(function(){}); }
+  function syncAllFromCloud() { if (!firebaseDb) return; var f = getFiltered(); f.forEach(function(q) { loadNoteCloud(q.id, function(v) { var el = document.getElementById('note_' + q.id); if (el && el.value !== v) el.value = v; }); }); }
+  function saveNote(id, v, skipCloud) { try { localStorage.setItem(SK_N + id, v); } catch (e) {} if (!skipCloud && firebaseDb) { firebaseDb.ref('notes/' + id).set(v).catch(function(){}); } }
   function loadDarkMode() { try { return localStorage.getItem(SK_D) === 'true'; } catch (e) { return false; } }
   function saveDarkMode(v) { try { localStorage.setItem(SK_D, v ? 'true' : 'false'); } catch (e) {} }
   function loadCategory() { try { return localStorage.getItem(SK_C) || null; } catch (e) { return null; } }
@@ -121,9 +128,15 @@
   function genId() { return 'q_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9); }
 
   var questions = [], currentCategory = null, searchQuery = '', editingId = null, pendingDel = null, darkMode = false, noteTimers = {};
+  var firebaseDb = null, firebaseConfigured = false;
 
   function showToast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(function() { t.classList.remove('show'); }, 2000); }
   function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+  function loadFbConfig() { try { var c = localStorage.getItem('interview_bank_fb_config'); return c ? JSON.parse(c) : null; } catch(e) { return null; } }
+  function saveFbConfig(c) { try { localStorage.setItem('interview_bank_fb_config', JSON.stringify(c)); } catch(e) {} }
+  function initFirebase() { var cfg = loadFbConfig(); if (cfg && cfg.apiKey && cfg.databaseURL) { try { if (typeof firebase !== 'undefined' && !firebase.apps.length) { firebase.initializeApp(cfg); firebaseDb = firebase.database(); firebaseConfigured = true; updateSyncUI(); syncAllFromCloud(); return true; } } catch(e) { console.warn('Firebase init failed', e); } } updateSyncUI(); return false; }
+  function updateSyncUI() { var btn = document.getElementById('syncLabel'); if (btn) { if (firebaseConfigured) { btn.innerHTML = '☁️ 已同步'; } else { btn.innerHTML = '☁️ 云同步'; } } }
 
   function applyDarkMode(v) {
     darkMode = v;
@@ -242,8 +255,16 @@
     window.addEventListener('scroll', handleBackToTop, { passive: true });
     document.addEventListener('keydown', handleKeyboard);
     handleBackToTop();
+    initFirebase();
     document.getElementById('confirmDialog').addEventListener('click', function(e) { if (e.target === this) closeConfirmDialog(); });
   }
+
+  function openSyncModal() { var cfg = loadFbConfig(); var input = document.getElementById('syncConfigInput'); if (input && cfg) input.value = JSON.stringify(cfg, null, 2); document.getElementById('syncModal').classList.add('active'); }
+  function closeSyncModal() { document.getElementById('syncModal').classList.remove('active'); }
+  function closeSyncModalOutside(e) { if (e.target === document.getElementById('syncModal')) closeSyncModal(); }
+  function saveSyncConfig() { var raw = document.getElementById('syncConfigInput').value.trim(); try { var cfg = JSON.parse(raw); saveFbConfig(cfg); closeSyncModal(); showToast('配置已保存，同步已启用'); if (firebaseDb) { firebase.app().delete().then(function() { firebaseDb = null; firebaseConfigured = false; initFirebase(); }); } else { initFirebase(); } } catch(e) { showToast('JSON 格式错误，请检查'); } }
+  function disableSync() { saveFbConfig(null); if (firebaseDb) { firebase.app().delete().then(function() { firebaseDb = null; firebaseConfigured = false; updateSyncUI(); closeSyncModal(); showToast('云同步已关闭'); }); } else { updateSyncUI(); closeSyncModal(); showToast('云同步已关闭'); } }
+  function testFirebaseConnection() { var raw = document.getElementById('syncConfigInput').value.trim(); var el = document.getElementById('syncTestResult'); try { var cfg = JSON.parse(raw); el.textContent = '测试中…'; el.className = 'text-xs text-blue-500'; fetch(cfg.databaseURL + '/.json').then(function(r) { if (r.ok) { el.textContent = '✓ 连接成功'; el.className = 'text-xs text-green-500'; } else { el.textContent = '✗ 连接失败 (' + r.status + ')'; el.className = 'text-xs text-red-500'; } }).catch(function(e) { el.textContent = '✗ 连接失败: ' + e.message; el.className = 'text-xs text-red-500'; }); } catch(e) { el.textContent = '✗ JSON 格式错误'; el.className = 'text-xs text-red-500'; } }
 
   window.selectCategory = selectCategory;
   window.toggleSidebar = toggleSidebar;
@@ -260,6 +281,12 @@
   window.handleSearch = handleSearch;
   window.toggleDarkMode = toggleDarkMode;
   window.scrollToTop = scrollToTop;
+  window.openSyncModal = openSyncModal;
+  window.closeSyncModal = closeSyncModal;
+  window.closeSyncModalOutside = closeSyncModalOutside;
+  window.saveSyncConfig = saveSyncConfig;
+  window.disableSync = disableSync;
+  window.testFirebaseConnection = testFirebaseConnection;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
