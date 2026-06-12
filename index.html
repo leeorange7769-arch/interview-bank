@@ -349,6 +349,7 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
     renderSidebar(); renderQuestions(); updateHeader();
     window.addEventListener('scroll', handleBackToTop, { passive: true });
     document.addEventListener('keydown', handleKeyboard);
+    document.body.addEventListener('click', function(e) { var img = e.target.closest('img[alt="题目图片"]'); if (img) { openLightbox(img.src); } });
     handleBackToTop();
     initSync();
     checkStorageQuota();
@@ -404,7 +405,7 @@ A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray
   window.closeBatchImportModal = closeBatchImportModal;
   window.closeBatchImportOutside = closeBatchImportOutside;
   window.parseBatchPreview = parseBatchPreview;
-  window.openLightbox = function(src) { document.getElementById('lightboxImg').src = src; document.getElementById('imageLightbox').classList.add('active'); };
+  window.openLightbox = function(src) { var lb = document.getElementById('imageLightbox'), li = document.getElementById('lightboxImg'); if (!lb || !li) return; li.src = src; lb.classList.add('active'); };
   window.closeLightbox = function() { document.getElementById('imageLightbox').classList.remove('active'); };
   window.verifyAdmin = verifyAdmin;
   window.submitAdmin = submitAdmin;
