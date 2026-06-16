@@ -1,471 +1,1204 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>公务员面试题库 · 个人备考收藏</title>
-  <script src="https://cdn.tailwindcss.com">
-  
-  </script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: { extend: { colors: { navy: { 50: '#f0f4f8', 100: '#d9e2ec', 200: '#bcccdc', 300: '#9fb3c8', 400: '#829ab1', 500: '#627d98', 600: '#486581', 700: '#334e68', 800: '#243b53', 900: '#1a2d47' } } } }
-    }
-  </script>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
-    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
-    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
-    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
-    .answer-body { max-height: 0; overflow: hidden; transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), padding 0.45s ease, opacity 0.3s ease; opacity: 0; padding-top: 0; padding-bottom: 0; }
-    .answer-body.open { max-height: 3000px; opacity: 1; padding-top: 1rem; padding-bottom: 1rem; }
-    .note-textarea { resize: vertical; min-height: 80px; line-height: 1.7; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
-    .note-textarea:focus { outline: none; }
-    .back-to-top { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease; transform: translateY(20px); }
-    .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
-    .modal-overlay { opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease; }
-    .modal-overlay.active { opacity: 1; visibility: visible; }
-    .modal-panel { transform: scale(0.95) translateY(10px); transition: transform 0.25s ease; }
-    .modal-overlay.active .modal-panel { transform: scale(1) translateY(0); }
-    @media (max-width: 767px) { .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; z-index: 50; } .sidebar.open { transform: translateX(0); } .sidebar-backdrop { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; } .sidebar-backdrop.active { opacity: 1; visibility: visible; } }
-    .question-card { transition: box-shadow 0.25s ease, transform 0.2s ease; }
-    .question-card:hover { transform: translateY(-1px); }
-    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-120px); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; }
-    .admin-only { display: none !important; } body.admin-active .admin-only { display: flex !important; } .toast.show { transform: translateX(-50%) translateY(0); }
-    .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: flex; align-items: center; justify-content: center; cursor: zoom-out; opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease; }
-    .lightbox.active { opacity: 1; visibility: visible; }
-    .lightbox img { max-width: 95vw; max-height: 95vh; object-fit: contain; border-radius: 4px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>结构化面试题库</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --bg: #ffffff; --bg2: #f7f7f5; --bg3: #f0eeeb;
+  --text: #37352f; --text2: #787774; --text3: #acaaa6;
+  --border: #e9e9e7; --border2: #d5d5d2;
+  --accent: #2f80ed; --accent-bg: #eaf1fd;
+  --radius: 6px; --shadow-md: 0 4px 16px rgba(0,0,0,.1);
+  --star: #f59e0b;
+  --green: #16a34a; --green-bg: #dcfce7;
+  --amber: #d97706; --amber-bg: #fef3c7;
+  --red: #dc2626; --red-bg: #fee2e2;
+  --purple: #7c3aed; --purple-bg: #ede9fe;
+}
+* { font-family: var(--font); }
+body { background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+.layout { display: flex; min-height: 100vh; }
+
+/* ── Sidebar ── */
+.sidebar { width: 240px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 50; transition: transform .25s; }
+.sidebar-logo { padding: 14px 16px 12px; font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.sync-pill { margin-left: auto; font-size: 11px; font-weight: 400; padding: 2px 7px; border-radius: 20px; background: var(--green-bg); color: var(--green); transition: all .3s; white-space: nowrap; }
+.sync-pill.syncing { background: var(--amber-bg); color: var(--amber); }
+.sync-pill.offline { background: var(--bg3); color: var(--text2); }
+.sidebar-section { padding: 10px 10px 4px; font-size: 11px; font-weight: 600; color: var(--text3); letter-spacing: .6px; text-transform: uppercase; }
+.nav-item { display: flex; align-items: center; gap: 7px; padding: 5px 10px; margin: 1px 6px; border-radius: var(--radius); cursor: pointer; font-size: 13px; color: var(--text2); transition: background .12s, color .12s; user-select: none; border: none; background: none; text-align: left; width: calc(100% - 12px); }
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: var(--bg3); color: var(--text); font-weight: 500; }
+.nav-item .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.nav-arrow { font-size: 10px; color: var(--text3); transition: transform .15s; margin-left: 2px; }
+.nav-item.expanded .nav-arrow { transform: rotate(90deg); }
+.nav-count { margin-left: auto; font-size: 11px; color: var(--text3); }
+.subnav { display: none; }
+.subnav.open { display: block; }
+.subnav-item { display: flex; align-items: center; padding: 4px 10px 4px 30px; margin: 1px 6px; border-radius: var(--radius); cursor: pointer; font-size: 12px; color: var(--text2); transition: background .12s; border: none; background: none; text-align: left; width: calc(100% - 12px); }
+.subnav-item:hover { background: var(--bg3); color: var(--text); }
+.subnav-item.active { background: var(--border); color: var(--text); font-weight: 500; }
+.sidebar-footer { margin-top: auto; padding: 10px 8px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.side-footer-btn { display: flex; align-items: center; gap: 7px; padding: 5px 10px; border-radius: var(--radius); font-size: 13px; color: var(--text2); cursor: pointer; transition: background .12s; border: none; background: none; width: 100%; margin-bottom: 2px; }
+.side-footer-btn:hover { background: var(--bg3); color: var(--text); }
+
+/* ── Main ── */
+.main { margin-left: 240px; flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+.topbar { height: 52px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 28px 0 24px; gap: 10px; position: sticky; top: 0; background: var(--bg); z-index: 40; flex-shrink: 0; }
+.topbar-title { font-size: 15px; font-weight: 600; flex: 1; }
+.search-box { display: flex; align-items: center; gap: 6px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 5px 10px; transition: border-color .15s; }
+.search-box input { border: none; background: none; outline: none; font-size: 13px; color: var(--text); width: 150px; }
+.search-box input::placeholder { color: var(--text3); }
+.search-box:focus-within { border-color: var(--border2); }
+.topbar-btn { display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all .12s; white-space: nowrap; }
+.btn-dark { background: var(--text); color: #fff; }
+.btn-dark:hover { opacity: .85; }
+.btn-outline { background: none; border: 1px solid var(--border); color: var(--text2); }
+.btn-outline:hover { border-color: var(--border2); color: var(--text); }
+.btn-accent { background: var(--accent-bg); color: var(--accent); border: 1px solid #c3daf9; }
+.btn-accent:hover { background: #d4e9fd; }
+.btn-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid #c4b5fd; }
+.btn-purple:hover { background: #ddd6fe; }
+
+.content { padding: 28px 36px; max-width: 860px; }
+
+/* ── Chapter banner ── */
+.chapter-banner { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding: 14px 18px; border-radius: 8px; border: 1px solid var(--border); }
+.chapter-info h2 { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+.chapter-info p { font-size: 12px; color: var(--text2); }
+.filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+.pill { padding: 4px 11px; border-radius: 4px; font-size: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text2); cursor: pointer; transition: all .12s; }
+.pill:hover { border-color: var(--border2); color: var(--text); }
+.pill.active { border-color: var(--accent); background: var(--accent-bg); color: var(--accent); }
+
+/* ── List toolbar ── */
+.list-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.toolbar-label { font-size: 12px; color: var(--text3); }
+.seg-ctrl { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.seg-btn { padding: 4px 10px; font-size: 12px; background: none; border: none; color: var(--text2); cursor: pointer; transition: background .1s; border-right: 1px solid var(--border); }
+.seg-btn:last-child { border-right: none; }
+.seg-btn.active { background: var(--bg3); color: var(--text); font-weight: 500; }
+.filter-select { padding: 4px 8px; font-size: 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text2); outline: none; cursor: pointer; }
+
+/* ── Table ── */
+.q-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.q-table th { font-size: 11px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; padding: 0 10px 8px; text-align: left; border-bottom: 1px solid var(--border); }
+.q-row { transition: background .1s; cursor: pointer; }
+.q-row:hover td { background: var(--bg2); }
+.q-row td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.q-num { font-size: 12px; color: var(--text3); width: 32px; text-align: center; }
+.star-cell { width: 28px; text-align: center; }
+.star-btn { background: none; border: none; cursor: pointer; font-size: 15px; padding: 2px; line-height: 1; color: var(--text3); transition: color .1s, transform .1s; }
+.star-btn:hover { transform: scale(1.2); }
+.star-btn.starred { color: var(--star); }
+.q-title-cell { font-size: 13px; color: var(--text); line-height: 1.5; }
+.q-meta { font-size: 11px; color: var(--text3); margin-top: 3px; display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+.tag-sm { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 3px; }
+.mastery-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; padding: 1px 7px; border-radius: 10px; font-weight: 500; }
+.m-none { background: var(--bg3); color: var(--text3); }
+.m-learning { background: var(--amber-bg); color: var(--amber); }
+.m-familiar { background: #dbeafe; color: #2563eb; }
+.m-mastered { background: var(--green-bg); color: var(--green); }
+.q-actions-cell { width: 150px; }
+.q-actions { display: flex; gap: 4px; opacity: 0; transition: opacity .12s; }
+.q-row:hover .q-actions { opacity: 1; }
+.act-btn { padding: 3px 7px; border-radius: 4px; font-size: 11px; border: 1px solid var(--border); background: var(--bg); color: var(--text2); cursor: pointer; transition: all .12s; }
+.act-btn:hover { border-color: var(--border2); color: var(--text); background: var(--bg2); }
+.act-btn.del:hover { border-color: #fca5a5; background: var(--red-bg); color: var(--red); }
+.act-btn.practice-btn { color: var(--accent); border-color: #c3daf9; }
+.act-btn.practice-btn:hover { background: var(--accent-bg); }
+
+/* ── Expand row ── */
+.expand-row td { padding: 0; border-bottom: 1px solid var(--border); }
+.expand-inner { padding: 16px 18px 18px 52px; background: var(--bg2); }
+.expand-section { margin-bottom: 14px; }
+.expand-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+.expand-answer { font-size: 13px; color: var(--text); line-height: 1.8; }
+.expand-note textarea { width: 100%; border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 11px; font-size: 13px; color: var(--text); background: var(--bg); resize: none; outline: none; min-height: 72px; line-height: 1.6; transition: border-color .15s; }
+.expand-note textarea:focus { border-color: var(--border2); }
+.note-saved { font-size: 11px; color: var(--green); opacity: 0; transition: opacity .3s; }
+.note-saved.show { opacity: 1; }
+.mastery-row { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.mastery-opt { padding: 4px 12px; border-radius: 20px; font-size: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text2); cursor: pointer; transition: all .12s; }
+.mastery-opt:hover { border-color: var(--border2); }
+.mastery-opt.active-none { background: var(--bg3); color: var(--text); border-color: var(--border2); }
+.mastery-opt.active-learning { background: var(--amber-bg); color: var(--amber); border-color: #fcd34d; }
+.mastery-opt.active-familiar { background: #dbeafe; color: #2563eb; border-color: #93c5fd; }
+.mastery-opt.active-mastered { background: var(--green-bg); color: var(--green); border-color: #86efac; }
+
+/* ── Empty ── */
+.empty { text-align: center; padding: 60px 20px; color: var(--text3); }
+.empty-icon { font-size: 36px; margin-bottom: 10px; }
+
+/* ── Practice overlay ── */
+.practice-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 300; flex-direction: column; overflow-y: auto; }
+.practice-overlay.open { display: flex; }
+.practice-header { display: flex; align-items: center; gap: 12px; padding: 14px 24px; border-bottom: 1px solid var(--border); flex-shrink: 0; position: sticky; top: 0; background: var(--bg); z-index: 10; }
+.practice-progress-wrap { flex: 1; background: var(--bg3); border-radius: 4px; height: 6px; overflow: hidden; }
+.practice-progress-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width .4s; }
+.practice-body { max-width: 700px; margin: 0 auto; padding: 36px 24px; width: 100%; }
+.practice-counter { font-size: 12px; color: var(--text3); margin-bottom: 8px; }
+.practice-q { font-size: 18px; font-weight: 500; line-height: 1.6; color: var(--text); margin-bottom: 20px; }
+.timer-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.timer-display { font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg2); color: var(--text2); display: inline-flex; align-items: center; gap: 6px; }
+.timer-display.warning { background: var(--red-bg); border-color: #fca5a5; color: var(--red); }
+
+/* ── Record button ── */
+.rec-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--bg2); color: var(--text2); transition: all .15s; }
+.rec-btn:hover { border-color: var(--red); color: var(--red); }
+.rec-btn.recording { background: var(--red-bg); border-color: var(--red); color: var(--red); animation: recpulse 1.2s infinite; }
+@keyframes recpulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+.rec-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
+.audio-playback { margin-top: 8px; display: none; }
+.audio-playback.show { display: block; }
+.audio-playback audio { width: 100%; height: 36px; }
+
+/* ── STT button ── */
+.stt-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--bg2); color: var(--text2); transition: all .15s; }
+.stt-btn:hover { border-color: var(--purple); color: var(--purple); }
+.stt-btn.listening { background: var(--purple-bg); border-color: var(--purple); color: var(--purple); animation: recpulse 1.2s infinite; }
+
+.practice-note-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.practice-note-area { width: 100%; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; font-size: 13px; color: var(--text); background: var(--bg2); resize: none; outline: none; min-height: 80px; line-height: 1.65; margin-bottom: 20px; }
+.practice-note-area:focus { border-color: var(--border2); }
+.practice-footer { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.p-btn { padding: 8px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all .12s; }
+.p-btn-primary { background: var(--text); color: #fff; }
+.p-btn-primary:hover { opacity: .85; }
+.p-btn-ghost { background: none; border: 1px solid var(--border); color: var(--text2); }
+.p-btn-ghost:hover { border-color: var(--border2); color: var(--text); }
+.reveal-btn { background: var(--accent-bg); color: var(--accent); border: 1px solid #c3daf9; padding: 8px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; }
+.reveal-btn:hover { background: #d4e9fd; }
+.answer-hidden { display: none; }
+.practice-divider { border: none; border-top: 1px dashed var(--border); margin: 0 0 20px; }
+.practice-answer-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
+.practice-answer-text { font-size: 14px; color: var(--text); line-height: 1.8; }
+.wrong-badge { background: var(--red-bg); color: var(--red); border: 1px solid #fca5a5; }
+.wrong-badge.active { border-color: var(--red); }
+
+/* ── AI Review ── */
+.ai-review-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border: none; transition: opacity .15s; margin-top: 12px; }
+.ai-review-btn:hover { opacity: .88; }
+.ai-review-btn:disabled { opacity: .5; cursor: not-allowed; }
+.ai-review-box { margin-top: 16px; background: linear-gradient(135deg, #f5f3ff, #ede9fe); border: 1px solid #c4b5fd; border-radius: 8px; padding: 16px; display: none; }
+.ai-review-box.show { display: block; }
+.ai-review-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.ai-review-title { font-size: 12px; font-weight: 600; color: var(--purple); text-transform: uppercase; letter-spacing: .5px; }
+.ai-review-content { font-size: 13px; color: var(--text); line-height: 1.8; white-space: pre-wrap; }
+.ai-score { display: inline-flex; align-items: center; gap: 4px; font-size: 22px; font-weight: 700; color: var(--purple); margin-right: 8px; }
+.ai-key { font-size: 11px; padding: 1px 8px; border-radius: 4px; background: rgba(124,58,237,.1); color: var(--purple); border: none; cursor: pointer; }
+
+/* ── Stats ── */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.stats-big-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+.stats-big-val { font-size: 32px; font-weight: 700; color: var(--text); line-height: 1.1; }
+.stats-big-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+.streak-flame { font-size: 24px; margin-right: 6px; }
+.ch-prog-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.ch-prog-name { font-size: 12px; color: var(--text2); width: 100px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ch-prog-bar-wrap { flex: 1; background: var(--bg3); border-radius: 4px; height: 6px; }
+.ch-prog-bar { height: 100%; border-radius: 4px; transition: width .5s; }
+.ch-prog-pct { font-size: 11px; color: var(--text3); width: 32px; text-align: right; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-top: 10px; }
+.cal-cell { aspect-ratio: 1; border-radius: 3px; background: var(--bg3); }
+.cal-cell.practiced { background: var(--accent); opacity: .7; }
+.cal-cell.today { background: var(--accent); opacity: 1; outline: 2px solid var(--accent); }
+.section-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px; margin-top: 4px; }
+
+/* ── Import/Export ── */
+.import-drop { border: 2px dashed var(--border2); border-radius: 8px; padding: 32px; text-align: center; color: var(--text2); cursor: pointer; transition: border-color .15s; }
+.import-drop:hover, .import-drop.drag-over { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+
+/* ── Partner (搭档对练) ── */
+.partner-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 400; align-items: center; justify-content: center; padding: 16px; }
+.partner-overlay.open { display: flex; }
+.partner-modal { background: var(--bg); border-radius: 12px; padding: 28px; width: 100%; max-width: 440px; box-shadow: var(--shadow-md); }
+.partner-modal h2 { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+.partner-modal p { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+.room-code-display { font-size: 32px; font-weight: 700; letter-spacing: 6px; text-align: center; color: var(--accent); background: var(--accent-bg); border-radius: 8px; padding: 16px; margin-bottom: 14px; cursor: pointer; transition: background .15s; }
+.room-code-display:hover { background: #d4e9fd; }
+.partner-status { font-size: 13px; color: var(--text2); text-align: center; padding: 10px; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.partner-status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); animation: recpulse 1.5s infinite; }
+.partner-status .dot.connected { background: var(--green); animation: none; }
+.partner-chat { height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; margin-bottom: 10px; background: var(--bg2); display: flex; flex-direction: column; gap: 6px; }
+.chat-msg { font-size: 12px; padding: 6px 10px; border-radius: 6px; max-width: 80%; line-height: 1.5; }
+.chat-msg.me { background: var(--accent); color: #fff; align-self: flex-end; }
+.chat-msg.them { background: var(--bg3); color: var(--text); align-self: flex-start; }
+.chat-msg .chat-label { font-size: 10px; opacity: .7; margin-bottom: 2px; }
+.chat-input-row { display: flex; gap: 6px; }
+.chat-input { flex: 1; border: 1px solid var(--border); border-radius: var(--radius); padding: 7px 10px; font-size: 13px; outline: none; background: var(--bg); color: var(--text); }
+.chat-input:focus { border-color: var(--border2); }
+.partner-q-send { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; margin-bottom: 10px; }
+.partner-q-send p { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+
+/* ── Modal ── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.3); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
+.overlay.open { display: flex; }
+.modal { background: var(--bg); border-radius: 8px; padding: 24px; width: 100%; max-width: 520px; max-height: 92vh; overflow-y: auto; box-shadow: var(--shadow-md); }
+.modal h2 { font-size: 16px; font-weight: 600; margin-bottom: 18px; }
+.field { margin-bottom: 13px; }
+.field label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 5px; }
+.field input, .field select, .field textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; color: var(--text); background: var(--bg); outline: none; transition: border-color .15s; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--border2); }
+.field textarea { resize: vertical; min-height: 88px; line-height: 1.65; }
+.field-row { display: flex; gap: 10px; }
+.field-row .field { flex: 1; }
+.modal-footer { display: flex; gap: 8px; justify-content: flex-end; padding-top: 6px; }
+.btn { padding: 7px 14px; font-size: 13px; border-radius: var(--radius); cursor: pointer; transition: all .12s; border: none; }
+.btn-ghost { background: none; border: 1px solid var(--border); color: var(--text2); }
+.btn-ghost:hover { border-color: var(--border2); color: var(--text); }
+.btn-primary { background: var(--text); border: 1px solid var(--text); color: #fff; }
+.btn-primary:hover { opacity: .85; }
+
+/* ── Trash ── */
+.trash-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; }
+.trash-item-text { flex: 1; font-size: 13px; color: var(--text2); line-height: 1.5; }
+.trash-item-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* ── Toast ── */
+.toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: #37352f; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 999; white-space: nowrap; }
+.toast.show { opacity: 1; }
+
+/* ── API Key notice ── */
+.api-notice { background: var(--amber-bg); border: 1px solid #fcd34d; border-radius: var(--radius); padding: 10px 14px; font-size: 12px; color: var(--amber); margin-bottom: 14px; display: none; }
+.api-notice.show { display: block; }
+
+/* ── Admin ── */
+.admin-badge { display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:2px 8px;border-radius:20px;background:#fff8e1;color:#b45309;border:1px solid #fcd34d;cursor:pointer;transition:all .15s;user-select:none; }
+.admin-badge:hover { background:#fef3c7; }
+.admin-badge.active { background:#dcfce7;color:#16a34a;border-color:#86efac; }
+.lock-icon { font-size:12px; }
+.admin-wall { display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;align-items:center;justify-content:center;padding:16px; }
+.admin-wall.open { display:flex; }
+.admin-box { background:var(--bg);border-radius:12px;padding:28px;width:100%;max-width:360px;box-shadow:var(--shadow-md);text-align:center; }
+.admin-box h2 { font-size:16px;font-weight:600;margin-bottom:6px; }
+.admin-box p { font-size:13px;color:var(--text2);margin-bottom:18px; }
+.admin-error { font-size:12px;color:var(--red);margin-top:8px;min-height:18px; }
+/* ── Mobile ── */
+.mobile-topbar { display: none; }
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-md); }
+  .main { margin-left: 0; }
+  .mobile-topbar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 40; flex-shrink: 0; }
+  .mobile-menu-btn { background: none; border: none; cursor: pointer; color: var(--text); font-size: 20px; padding: 2px 4px; }
+  .topbar { display: none; }
+  .content { padding: 16px; }
+  .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.3); z-index: 45; }
+  .sidebar-overlay.open { display: block; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .practice-body { padding: 20px 16px; }
+  .practice-q { font-size: 16px; }
+}
+</style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-200">
+<body>
+<div class="layout">
 
-<div id="toast" class="toast bg-gray-800 dark:bg-gray-100 text-white dark:text-gray-800 px-5 py-2.5 rounded-lg shadow-lg text-sm font-medium pointer-events-none"></div>
-<div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-40 md:hidden" onclick="closeSidebar()"></div>
-
-<aside id="sidebar" class="sidebar fixed left-0 top-0 h-full w-64 bg-navy-900 dark:bg-gray-950 text-white flex flex-col z-50 md:z-30 shadow-2xl md:shadow-xl">
-  <div class="px-5 py-5 border-b border-white/10"><div class="flex items-center gap-2.5"><svg class="w-7 h-7 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg><div><h1 class="text-base font-bold tracking-wide">面试题库</h1><p class="text-[10px] text-blue-200/60 tracking-wider">公务员面试 · 备考收藏</p></div></div></div>
-  <div class="px-4 py-3"><div class="relative"><svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input id="searchInput" type="text" placeholder="搜索面试题目…" oninput="handleSearch(this.value)" class="w-full pl-9 pr-3 py-2 bg-white/10 border border-white/15 rounded-lg text-sm text-white placeholder-white/35 focus:outline-none focus:bg-white/15 focus:border-white/25 transition-colors"></div></div>
-  <nav class="flex-1 overflow-y-auto sidebar-scroll px-3 py-2"><p class="px-3 py-1 text-[11px] text-white/40 uppercase tracking-widest mb-1">题型分类</p><div id="categoryList" class="space-y-0.5"></div></nav>
-  <div class="px-4 py-3 border-t border-white/10 space-y-2">
-    <button onclick="openAddModal()" class="admin-only w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>新增题目</button>
-    <button onclick="openLogin()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 text-sm font-medium rounded-lg transition-colors mt-2">🔑 管理员登录</button>
-    <div id="adminBadge" style="display:none" class="px-4 py-2 mb-2 bg-green-600/20 text-green-300 text-xs rounded-lg text-center">🔑 管理员</div>
-    <button onclick="openTrashModal()" class="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors flex items-center justify-between text-red-300 hover:bg-red-900/20 hover:text-red-200 mb-0.5" id="trashBtn"><span>🗑️ 回收站</span><span id="trashCount" class="text-xs text-red-300/60">0</span></button>
-    <button onclick="openBatchImportModal()" class="admin-only" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors mt-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>批量导入</button>
-    <button onclick="handleSyncClick()" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white/8 hover:bg-white/12 text-white/80 text-sm rounded-lg transition-colors mb-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg><span id="syncLabel">云同步</span></button>
-    <button id="darkModeToggle" onclick="toggleDarkMode()" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white/8 hover:bg-white/12 text-white/80 text-sm rounded-lg transition-colors"><svg id="darkIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg><span id="darkModeLabel">暗黑模式</span></button>
+<!-- ── Sidebar ── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    结构化面试题库
+    <span class="sync-pill offline" id="syncPill">离线</span>
+    <button class="admin-badge" id="adminBadge" onclick="openAdminAuth()" title="管理员登录"><span class="lock-icon">🔒</span><span id="adminLabel">访客</span></button>
+  </div>
+  <div style="height:6px"></div>
+  <div class="sidebar-section">导航</div>
+  <button class="nav-item" id="nav-all" onclick="switchView('all')"><span style="font-size:13px">📋</span> 全部题目 <span class="nav-count" id="navCountAll"></span></button>
+  <button class="nav-item" id="nav-starred" onclick="switchView('starred')"><span style="font-size:13px">⭐</span> 已收藏 <span class="nav-count" id="navCountStar"></span></button>
+  <button class="nav-item" id="nav-wrong" onclick="switchView('wrong')"><span style="font-size:13px">📌</span> 错题本 <span class="nav-count" id="navCountWrong"></span></button>
+  <button class="nav-item" id="nav-stats" onclick="switchView('stats')"><span style="font-size:13px">📊</span> 学习统计</button>
+  <div class="sidebar-section" style="margin-top:4px">题型分类</div>
+  <div id="navTree"></div>
+  <div class="sidebar-footer">
+    <button class="side-footer-btn" onclick="switchView('trash')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      回收站 <span id="trashCount" style="margin-left:auto;font-size:11px;color:var(--text3)"></span>
+    </button>
+    <button class="side-footer-btn" onclick="switchView('import')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      导入 / 导出
+    </button>
+    <button class="side-footer-btn" onclick="openPartner()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      搭档对练
+    </button>
+    <button class="side-footer-btn" onclick="openApiKeyModal()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+      AI 点评设置
+    </button>
   </div>
 </aside>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-<header class="md:hidden fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 z-30 px-4 py-3 flex items-center justify-between shadow-sm">
-  <button onclick="toggleSidebar()" class="p-1.5 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"><svg class="w-6 h-6 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-  <h1 class="text-base font-bold text-navy-900 dark:text-gray-100">面试题库</h1>
-  <button onclick="openAddModal()" class="p-1.5 -mr-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-blue-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></button>
-</header>
-
-<main id="mainContent" class="md:ml-64 pt-14 md:pt-0 min-h-screen">
-  <div class="hidden md:flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 sticky top-0 z-20"><div><h2 id="currentCategoryTitle" class="text-lg font-bold text-navy-900 dark:text-gray-100">全部题目</h2><p id="questionCount" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"></p></div><button onclick="openAddModal()" class="flex items-center gap-1.5 px-4 py-2 bg-navy-800 dark:bg-blue-600 hover:bg-navy-700 dark:hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>新增题目</button></div>
-  <div class="px-4 md:px-6 py-5">
-    <div id="emptyState" class="hidden text-center py-20"><svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><p class="text-gray-400 dark:text-gray-500 text-sm">暂无匹配的题目</p><p class="text-gray-400 dark:text-gray-500 text-xs mt-1">试试切换分类或添加新题目</p></div>
-    <div id="questionList" class="space-y-4"></div>
+<!-- ── Main ── -->
+<main class="main">
+  <div class="mobile-topbar">
+    <button class="mobile-menu-btn" onclick="openSidebar()">☰</button>
+    <span style="font-size:14px;font-weight:600;flex:1" id="mobileTitleBar">结构化面试题库</span>
+    <button class="topbar-btn btn-dark" onclick="openAdd()" style="padding:5px 10px;font-size:12px">＋ 新增</button>
   </div>
-  <div class="h-16"></div>
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">全部题目</div>
+    <div class="search-box">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="搜索题目…" oninput="onSearch()">
+    </div>
+    <button class="topbar-btn btn-accent" id="randomBtn" onclick="startRandom()" style="display:none">🎲 随机抽题</button>
+    <button class="topbar-btn btn-outline" id="practiceAllBtn" onclick="startPractice()" style="display:none">▶ 开始练习</button>
+    <button class="topbar-btn btn-dark" onclick="openAdd()">＋ 新增题目</button>
+  </div>
+  <div class="content" id="mainContent"></div>
 </main>
+</div>
 
-<button id="backToTop" onclick="scrollToTop()" class="back-to-top fixed bottom-6 right-6 z-40 w-11 h-11 bg-navy-800 dark:bg-gray-700 hover:bg-navy-700 dark:hover:bg-gray-600 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg></button>
-
-<div id="questionModal" class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-  <div class="modal-panel bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
-    <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><h3 id="modalTitle" class="text-lg font-bold text-navy-900 dark:text-gray-100">新增题目</h3><button onclick="closeModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
-    <form id="questionForm" onsubmit="handleFormSubmit(event); return false;" class="px-6 py-5 space-y-4">
-      <input type="hidden" id="editQuestionId" value="">
-      <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">题型分类 <span class="text-red-500">*</span></label><select id="formCategory" required class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"><option value="">请选择题型分类</option></select></div>
-      <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">面试题干 <span class="text-red-500">*</span></label><textarea id="formQuestion" required rows="3" placeholder="请输入完整的面试题干…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm resize-y focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"></textarea></div>
-      <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">题目图片（可选，漫画题适用）</label><div id="imageDropZone" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-colors" onclick="if(event.detail > 0 || event.pointerType) document.getElementById('formImageFile').click()"><div id="imagePreview" class="hidden mb-2"><img id="imagePreviewImg" src="" class="max-h-32 max-w-full mx-auto rounded-lg object-contain"></div><div id="imagePlaceholder"><svg class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><p class="text-xs text-gray-500 dark:text-gray-400">点击选择图片 或 直接 Ctrl+V 粘贴</p></div><input type="file" id="formImageFile" accept="image/*" class="hidden" onchange="handleImageFile(this)"><input type="hidden" id="formImage" value=""><button id="clearImageBtn" type="button" class="hidden mt-2 text-xs text-red-500 hover:text-red-400" onclick="clearImage()">移除图片</button></div>
+<!-- ── Practice overlay ── -->
+<div class="practice-overlay" id="practiceOverlay">
+  <div class="practice-header">
+    <button class="p-btn p-btn-ghost" onclick="closePractice()" style="padding:5px 10px;font-size:12px">✕ 退出</button>
+    <div class="practice-progress-wrap"><div class="practice-progress-bar" id="practiceBar"></div></div>
+    <span style="font-size:12px;color:var(--text3)" id="practiceCounter">0/0</span>
+  </div>
+  <div class="practice-body">
+    <div class="practice-counter" id="pSubCounter"></div>
+    <div class="practice-q" id="practiceQ"></div>
+    <div class="timer-row">
+      <div class="timer-display" id="timerDisplay">⏱ 3:00</div>
+      <button class="rec-btn" id="recBtn" onclick="toggleRecord()"><span class="rec-dot"></span>开始录音</button>
+      <button class="stt-btn" id="sttBtn" onclick="toggleSTT()">🎙 语音转文字</button>
+    </div>
+    <div class="audio-playback" id="audioPlayback"><audio id="audioPlayer" controls></audio></div>
+    <div class="practice-note-label">
+      <span>你的思路</span>
+    </div>
+    <textarea class="practice-note-area" id="practiceNote" placeholder="在这里记录你的答题思路，或点击「语音转文字」说话输入…"></textarea>
+    <div class="practice-footer">
+      <button class="reveal-btn" id="revealBtn" onclick="revealAnswer()">查看参考答案 ↓</button>
+      <div style="flex:1"></div>
+      <button class="p-btn p-btn-ghost" onclick="prevPractice()" id="prevBtn">← 上一题</button>
+      <button class="p-btn p-btn-primary" onclick="nextPractice()" id="nextBtn">下一题 →</button>
+    </div>
+    <div class="answer-hidden" id="answerSection" style="margin-top:20px">
+      <hr class="practice-divider">
+      <div class="practice-answer-label">参考要点</div>
+      <div class="practice-answer-text" id="practiceAnswerText"></div>
+      <!-- AI Review -->
+      <div id="aiReviewArea" style="margin-top:16px">
+        <div class="api-notice" id="apiNotice">⚠️ 尚未配置 Anthropic API Key，AI 点评功能不可用。请点击左侧「AI 点评设置」填入。</div>
+        <button class="ai-review-btn" id="aiReviewBtn" onclick="requestAIReview()" disabled>✦ AI 点评我的回答</button>
+        <div class="ai-review-box" id="aiReviewBox">
+          <div class="ai-review-header">
+            <span style="font-size:18px">✦</span>
+            <span class="ai-review-title">AI 点评</span>
+          </div>
+          <div class="ai-review-content" id="aiReviewContent"></div>
+        </div>
       </div>
-      <div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">参考答案</label><textarea id="formAnswer" rows="5" placeholder="请输入参考答案（可留空后续补充）…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm resize-y focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"></textarea></div>
-      <div class="flex items-center justify-end gap-3 pt-2"><button type="button" onclick="closeModal()" class="px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">取消</button><button type="submit" class="px-5 py-2.5 bg-navy-800 dark:bg-blue-600 hover:bg-navy-700 dark:hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">保存题目</button></div>
-    </form>
+      <div style="margin-top:16px">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:8px">这道题答得怎么样？</div>
+        <div class="practice-mastery" style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="mastery-opt" id="pm0" onclick="setPracticeMastery('none')">未掌握</button>
+          <button class="mastery-opt" id="pm1" onclick="setPracticeMastery('learning')">努力中</button>
+          <button class="mastery-opt" id="pm2" onclick="setPracticeMastery('familiar')">比较熟</button>
+          <button class="mastery-opt" id="pm3" onclick="setPracticeMastery('mastered')">已掌握</button>
+        </div>
+        <div style="margin-top:8px">
+          <button class="mastery-opt wrong-badge" id="wrongBtn" onclick="toggleWrong()" style="font-size:11px">📌 加入错题本</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- ── Partner overlay ── -->
+<div class="partner-overlay" id="partnerOverlay" onclick="if(event.target===this&&!partnerConnected)closePartner()">
+  <div class="partner-modal">
+    <h2>搭档对练 👥</h2>
+    <p>和备考搭档实时对练，互出题目、互发评论。</p>
+    <div id="partnerSetup">
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input id="partnerName" class="chat-input" placeholder="你的昵称（如：诚）" style="flex:1">
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <input id="joinRoomInput" class="chat-input" placeholder="输入房间号加入（留空则新建）" style="flex:1">
+        <button class="btn btn-primary" onclick="joinOrCreate()">进入</button>
+      </div>
+    </div>
+    <div id="partnerRoom" style="display:none">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px">房间号（点击复制分享给搭档）</div>
+      <div class="room-code-display" id="roomCodeDisplay" onclick="copyRoomCode()">------</div>
+      <div class="partner-status" id="partnerStatus"><span class="dot" id="partnerDot"></span><span id="partnerStatusText">等待搭档加入…</span></div>
+      <div class="partner-q-send">
+        <p>发送题目给搭档</p>
+        <select class="filter-select" id="partnerQSelect" style="width:100%;margin-bottom:6px;font-size:12px"></select>
+        <button class="btn btn-primary" style="font-size:12px;padding:5px 12px" onclick="sendQuestionToPartner()">发送题目 →</button>
+      </div>
+      <div class="partner-chat" id="partnerChat"></div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chatMsgInput" placeholder="发送消息…" onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn btn-primary" style="font-size:12px;padding:5px 10px" onclick="sendChat()">发送</button>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px">
+      <button class="btn btn-ghost" onclick="closePartner()">关闭</button>
+    </div>
+  </div>
+</div>
 
-<div id="syncModal" class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="closeSyncModalOutside(event)"><div class="modal-panel bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()"><div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><h3 class="text-lg font-bold text-navy-900 dark:text-gray-100">云同步设置</h3><button onclick="closeSyncModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div><div class="px-6 py-5 space-y-4"><div class="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 text-sm text-blue-800 dark:text-blue-200"><p class="font-medium mb-1">你的数据库地址（已就绪）</p><p class="text-xs">打开 <a href="https://console.firebase.google.com" target="_blank" class="underline">Firebase 控制台</a> → Realtime Database → 复制页面顶部的数据库 URL，粘贴到下方。</p></div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Realtime Database URL</label><input id="syncUrlInput" type="text" placeholder="https://xxx-default-rtdb.asia-southeast1.firebasedatabase.app" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow font-mono text-xs"><div class="flex items-center justify-between"><button onclick="testSyncConnection()" class="px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors">测试连接</button><span id="syncTestResult" class="text-xs"></span></div><div class="flex items-center justify-end gap-3 pt-2"><button onclick="disableSync()" class="px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors">关闭同步</button><button onclick="closeSyncModal()" class="px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">取消</button><button onclick="saveSyncConfig()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">保存并启用</button></div></div></div></div>
+<!-- ── API Key Modal ── -->
+<div class="overlay" id="apiKeyModal" onclick="if(event.target===this)closeApiKeyModal()">
+  <div class="modal" style="max-width:400px">
+    <h2>AI 点评设置</h2>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">填入你的 Anthropic API Key，AI 点评功能将在练习模式中分析你的答案并给出评分和建议。<br><br>Key 仅保存在本设备浏览器中，不会上传到服务器。</p>
+    <div class="field">
+      <label>Anthropic API Key</label>
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-…">
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:14px">获取方式：<a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a> → API Keys → Create Key</p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeApiKeyModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveApiKey()">保存</button>
+    </div>
+  </div>
+</div>
 
-<div id="batchImportModal" class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="closeBatchImportOutside(event)"><div class="modal-panel bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()"><div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><h3 class="text-lg font-bold text-navy-900 dark:text-gray-100">批量导入题目</h3><button onclick="closeBatchImportModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div><div class="px-6 py-5 space-y-4"><div class="bg-amber-50 dark:bg-amber-900/30 rounded-lg p-4 text-sm text-amber-800 dark:text-amber-200"><p class="font-medium mb-1">粘贴格式说明</p><p class="text-xs">每道题用 <code>---</code>（三个减号，单独一行）分隔。题干以 <code>Q：</code> 开头，答案以 <code>A：</code> 开头。</p><pre class="text-xs mt-2 bg-amber-100 dark:bg-amber-800/50 p-2 rounded">Q：题干内容
-A：参考答案内容
-I：https://图片链接（可选）
----
-Q：第二个题干
-A：第二个答案</pre></div><div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">默认分类 <span class="text-red-500">*</span></label><select id="batchCategory" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"><option value="">请选择</option></select></div><div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">粘贴问答内容</label><textarea id="batchContent" rows="10" placeholder="Q：题干…
-A：答案…
----
-Q：题干…
-A：答案…" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm resize-y focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow font-mono text-xs"></textarea></div><div><button onclick="parseBatchPreview()" class="px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors">预览解析结果</button><span id="batchPreview" class="text-xs text-gray-500 ml-3"></span></div><div class="flex items-center justify-end gap-3 pt-2"><button onclick="closeBatchImportModal()" class="px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">取消</button><button onclick="executeBatchImport()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">导入题目</button></div></div></div></div>
+<!-- Edit Modal -->
+<div class="overlay" id="editModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2 id="modalTitle">新增题目</h2>
+    <div class="field"><label>题目内容</label><textarea id="fTitle" rows="3" placeholder="请输入面试题目…"></textarea></div>
+    <div class="field-row">
+      <div class="field"><label>所属章节</label>
+        <select id="fChapter" onchange="updateSubOptions()">
+          <option value="1">第一章 综合分析类</option><option value="2">第二章 人际关系类</option>
+          <option value="3">第三章 组织策划类</option><option value="4">第四章 应急应变类</option>
+          <option value="5">第五章 自我认知类</option><option value="6">第六章 行政实务类</option>
+          <option value="7">第七章 情景模拟类</option><option value="8">第八章 即时表达类</option>
+          <option value="9">第九章 无领导小组讨论</option>
+        </select>
+      </div>
+      <div class="field"><label>子类型</label><select id="fSub"></select></div>
+    </div>
+    <div class="field"><label>标签（逗号分隔，可留空）</label><input id="fTags" placeholder="如：廉洁，担当，大局意识"></div>
+    <div class="field"><label>参考答案要点</label><textarea id="fAnswer" rows="5" placeholder="分条撰写答题要点，建议用中文分号；分隔…"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveQuestion()">保存</button>
+    </div>
+  </div>
+</div>
 
-<div id="trashModal" class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="closeTrashModalOutside(event)"><div class="modal-panel bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()"><div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between"><h3 class="text-lg font-bold text-navy-900 dark:text-gray-100">🗑️ 回收站</h3><button onclick="closeTrashModal()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div><div id="trashContent" class="px-6 py-5"></div></div></div>
+<div class="toast" id="toast"></div>
 
-<di</div>
-<div id="confirmDialog" class="fixed inset-0 bg-black/50 z-50 items-center justify-center p-4 hidden"><div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-sm p-6"><h3 class="text-lg font-bold text-navy-900 dark:text-gray-100 mb-2">确认删除</h3><p class="text-sm text-gray-600 dark:text-gray-400 mb-6">确定将这道题目移入回收站吗？可在回收站中恢复。</p><div class="flex items-center justify-end gap-3"><button onclick="closeConfirmDialog()" class="px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">取消</button><button id="confirmDeleteBtn" class="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white text-sm font-medium rounded-lg transition-colors">确认删除</button></div></div></div>
+<!-- ── Admin Auth Wall ── -->
+<div class="admin-wall" id="adminWall">
+  <div class="admin-box">
+    <div style="font-size:32px;margin-bottom:10px">🔐</div>
+    <h2>管理员验证</h2>
+    <p>输入管理员密码以解锁题库编辑权限</p>
+    <div class="field" style="text-align:left">
+      <label>密码</label>
+      <input type="password" id="adminPwdInput" placeholder="请输入管理员密码" onkeydown="if(event.key==='Enter')submitAdminPwd()" style="text-align:center;letter-spacing:4px">
+    </div>
+    <div class="admin-error" id="adminError"></div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:14px">
+      <button class="btn btn-ghost" onclick="closeAdminAuth()">取消</button>
+      <button class="btn btn-primary" onclick="submitAdminPwd()">验证</button>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-top:14px">默认密码：<code style="background:var(--bg2);padding:1px 6px;border-radius:3px">admin2024</code><br>可在代码中搜索 ADMIN_PASSWORD 修改</p>
+  </div>
+</div>
 
-<script>
-(function() {
-  'use strict';
-  var CATEGORIES = ['综合分析社会现象题','综合分析态度观点/哲理题','人际沟通题','应急应变题','计划组织题','现场模拟题','创新题型（漫画/回旋镖热点/串词）'];
-  var SK_Q = 'interview_bank_questions_v1', SK_DEL = 'interview_bank_deleted_v1', SK_N = 'interview_bank_note_', SK_D = 'interview_bank_dark_mode', SK_C = 'interview_bank_current_category';
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, set, push, remove, update, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  function getDefaultQuestions() {
-    return [
-      {id:'default_1',category:CATEGORIES[0],question:'当前很多地方政府推行"一窗通办"改革，但部分群众反映窗口人员业务不熟、效率不高，对此你怎么看？',answer:'【参考答题思路】\n\n一、表态：\n"一窗通办"改革的出发点是好的，体现了"让数据多跑路、群众少跑腿"的服务理念，是深化"放管服"改革的重要举措。但改革落地过程中暴露出的问题也不容忽视，需要客观看待、务实解决。\n\n二、分析原因：\n1. 培训不到位：窗口人员需要掌握多个部门的业务，短期培训难以覆盖全部知识点；\n2. 系统整合不完善：不同部门的信息系统尚未真正打通，数据壁垒仍然存在；\n3. 激励机制不足：窗口工作压力大、考核多，但职业发展空间有限，影响工作积极性；\n4. 过渡期阵痛：改革涉及流程再造，短期内效率下降是正常现象。\n\n三、对策建议：\n1. 加强业务培训，建立"老带新"机制和常态化学习制度；\n2. 加快信息系统整合，真正实现数据共享和业务协同；\n3. 完善考核激励，将群众满意度纳入绩效考核，畅通窗口人员晋升通道；\n4. 设置过渡期和双轨运行机制，确保改革平稳推进；\n5. 建立问题反馈渠道，及时收集群众意见并优化流程。\n\n四、总结：\n改革不可能一蹴而就，关键是要坚持问题导向，在推进中发现问题、在解决问题中完善改革，最终让群众真正享受到便捷高效的政务服务。'},
-      {id:'default_2',category:CATEGORIES[0],question:'近年来"躺平"文化在年轻人中流行，有人认为这是对社会责任的逃避，有人认为这是对不合理压力的理性反抗，你怎么看？',answer:'【参考答题思路】\n\n一、表态：\n"躺平"现象是当代社会转型期出现的一种亚文化现象，需要以辩证的眼光看待，不能简单贴标签，也不能一味否定。\n\n二、分析原因（多角度）：\n1. 经济层面：高房价、就业竞争激烈、生活成本上升，年轻人感到向上流动的通道变窄；\n2. 社会层面：内卷化竞争严重，"996"工作模式让年轻人身心俱疲；\n3. 心理层面：部分年轻人对成功定义趋于多元，不再以传统的"升职加薪"为唯一目标；\n4. 网络放大效应：社交媒体加速了情绪的传播和共鸣。\n\n三、辩证看待：\n一方面，适度"躺平"可以理解为对过度竞争的一种自我保护，是对生活节奏的主动调整；另一方面，完全放弃奋斗、逃避社会责任则不利于个人成长。\n\n四、对策：\n1. 政府层面：完善社会保障体系，降低年轻人生活成本，创造更多公平发展机会；\n2. 社会层面：营造理性健康的社会氛围，反对过度内卷，提倡劳逸结合；\n3. 个人层面：在奋斗与休整之间找到平衡，保持积极向上的生活态度。\n\n五、总结：\n我们既不能对"躺平"简单批判，也不能听之任之，而应该从制度、文化、个人三个维度综合施策，让年轻人既有奋斗的动力，也有喘息的空间。'},
-      {id:'default_3',category:CATEGORIES[0],question:'数字化政务服务平台不断推出，但老年人等群体面临"数字鸿沟"问题，你认为政府应该如何解决？',answer:'【参考答题思路】\n\n一、表态：\n数字化政务服务是大势所趋，提高了行政效率，方便了大多数群众。但"数字鸿沟"问题本质上是公共服务公平性的问题——不能因为技术升级而把一部分群体排除在服务之外。\n\n二、分析影响：\n1. 老年人、残障人士、低收入群体等在就医、社保、出行等方面遇到困难；\n2. 如果处理不当，会加剧社会不平等，背离"以人民为中心"的发展理念。\n\n三、对策建议：\n1. 保留传统服务渠道：线下窗口、电话咨询等传统方式不能"一刀切"取消；\n2. 推进适老化改造：政务APP增加大字版、语音导航、简化操作流程；\n3. 开展数字帮扶：社区开设智能手机培训班，志愿者一对一辅导；\n4. 家人代办机制：完善授权代办功能，让子女可以帮老人办理业务；\n5. 从源头设计：在开发新系统时就考虑无障碍设计，而不是事后修补。\n\n四、总结：\n技术进步的目的是服务所有人。政务服务数字化必须坚持"一个都不能少"的原则。'},
-      {id:'default_4',category:CATEGORIES[1],question:'习近平总书记说："人民对美好生活的向往，就是我们的奋斗目标。"请结合实际谈谈你的理解。',answer:'【参考答题思路】\n\n一、阐释含义：\n这句话深刻揭示了中国共产党人的初心和使命——为人民服务不是抽象的口号，而是具体的行动指针。\n\n二、结合实际：\n1. 脱贫攻坚：近1亿农村贫困人口全部脱贫，这是对人民"过上好日子"向往的直接回应；\n2. 教育医疗：推进义务教育均衡发展、医保跨省结算等改革，回应群众"上好学、看好病"的期盼；\n3. 生态环境：打赢蓝天保卫战、推行垃圾分类，回应群众对优美生态环境的需求；\n4. 基层治理："接诉即办"机制让群众诉求有了快速响应通道。\n\n三、作为公务员的践行：\n1. 树立为民情怀：时刻把群众冷暖放在心上；\n2. 提升服务本领：不断学习业务知识；\n3. 深入基层一线：多到群众中去了解真实需求；\n4. 勇于担当作为：面对群众急难愁盼问题不推诿、不敷衍。\n\n四、总结：\n"民之所望，政之所向"。作为公职人员，把这句话内化于心、外化于行，在平凡的岗位上做出让群众满意的成绩。'},
-      {id:'default_5',category:CATEGORIES[1],question:'"功成不必在我，功成必定有我"，请谈谈你对这句话的理解。',answer:'【参考答题思路】\n\n一、阐释含义：\n"功成不必在我"体现的是胸怀和境界——不计较个人得失，甘于做铺垫性、基础性的工作；"功成必定有我"体现的是担当和责任——每个人都应该主动作为、贡献力量。\n\n二、两者关系：\n辩证统一。"不必在我"讲的是格局，"必定有我"讲的是担当。前者克服急功近利，后者拒绝袖手旁观。\n\n三、结合工作实际：\n1. 基层工作很多是"前人栽树后人乘凉"——不能因为见效慢就不去做；\n2. 作为年轻干部，既要有"功成不必在我"的定力，也要有"功成必定有我"的拼劲。\n\n四、举例：\n塞罕坝三代人用60年把荒漠变林海——第一代人可能看不到成果，但正是这种精神支撑他们坚持。\n\n五、总结：\n要树立正确的政绩观，既不能急功近利搞形象工程，也不能消极等待，而应以"功成不必在我"的境界和"功成必定有我"的担当做好本职工作。'},
-      {id:'default_6',category:CATEGORIES[2],question:'你是新入职的公务员，老同事总是把琐碎的工作交给你，导致你自己的本职工作进度受到影响，你怎么办？',answer:'【参考答题思路】\n\n一、表明态度：\n作为新人，帮老同事做辅助性工作本身是融入团队、学习业务的好机会，但如果影响本职工作，就需要妥善沟通处理。\n\n二、处理原则：\n尊重老同事、积极沟通、合理拒绝、本职工作优先。\n\n三、具体做法：\n1. 反思自身：检查是否效率低导致做不完，有则先提升效率；\n2. 积极沟通：在合适时机诚恳与老同事沟通，说明自己手头任务紧张；\n3. 善用领导：如果沟通无效，向领导委婉反映，重点放在"如何更好地安排工作"；\n4. 学会说"不"：对明显不合理要求，温和而坚定地拒绝；\n5. 主动融入：积极参加集体活动，建立良好同事关系。\n\n四、总结：\n职场新人既要有谦虚好学的姿态，也要有维护自身工作边界的能力，用沟通化解矛盾，用能力赢得尊重。'},
-      {id:'default_7',category:CATEGORIES[2],question:'领导安排你和一位与你有矛盾的同事共同完成一项任务，你会如何处理？',answer:'【参考答题思路】\n\n一、表明态度：\n工作是工作，个人情绪不能影响任务完成。这是对我大局意识和协作能力的考验。\n\n二、处理步骤：\n1. 调整心态：反思矛盾根源，如果我有不对主动道歉；\n2. 主动破冰：找合适机会与同事坦诚沟通；\n3. 明确分工：根据各自特长合理分配并用书面确认；\n4. 过程协作：定期沟通进度，遇到问题共同商量；\n5. 功劳共享：任务完成后在领导面前肯定同事贡献。\n\n三、原则：对事不对人、求同存异、以诚相待。\n\n四、总结：\n职场中不可能和每个人都合得来，但优秀的公务员必须具备与不同人合作的能力。把共同任务作为修复关系的契机，反而可能化矛盾为友谊。'},
-      {id:'default_8',category:CATEGORIES[3],question:'你在窗口服务时，一位群众因等待时间过长突然情绪激动大声吵闹，引起其他群众围观，你怎么办？',answer:'【参考答题思路】\n\n一、处理原则：\n以人为本、稳定局面、快速处置、恢复秩序。\n\n二、具体步骤：\n1. 立即安抚：停下手中工作起身面对群众，先共情再解决问题："非常抱歉让您久等了，我能理解您的心情"；\n2. 隔离现场：请同事帮忙引导群众到旁边接待室，避免影响窗口秩序；\n3. 了解诉求：耐心倾听不打断不辩解，快速判断问题关键点；\n4. 高效解决：能处理的当场快速办理并解释原因，超出权限立即请示领导给出明确时间表；\n5. 后续跟进：留下联系方式让群众安心；\n6. 复盘改进：事后反思流程优化建议。\n\n三、关键点：\n千万不要和群众争辩对错，情绪激动时讲道理无效，先降温再办事。'},
-      {id:'default_9',category:CATEGORIES[3],question:'单位组织的重要会议即将开始，但会场投影设备突然故障，作为会务负责人你怎么办？',answer:'【参考答题思路】\n\n一、处理原则：\n沉着冷静、快速响应、多手准备、确保会议顺利进行。\n\n二、具体步骤：\n1. 立即排查：联系技术人员抢修，确认故障原因和预计修复时间；\n2. 启动预案：立即启用备用设备（便携投影仪等）；\n3. 替代方案：如短时间无法修复，改为分发纸质材料+口头汇报，或共享屏幕；\n4. 沟通协调：及时向领导报告情况和已采取的应对措施；\n5. 安抚与会者：安排工作人员倒水、发放材料，避免冷场；\n6. 事后总结：复盘故障原因，完善设备检查清单和应急预案。\n\n三、教训：\n大型会议必须提前1小时到场检查所有设备，且至少准备一套备用方案，这是会务工作的基本素养。'},
-      {id:'default_10',category:CATEGORIES[4],question:'单位要组织一次"乡村振兴"主题调研活动，领导让你负责，你怎么开展？',answer:'【参考答题思路】\n\n一、明确目标：\n深入了解乡村振兴战略在基层的落实情况、存在的问题和群众的真实需求。\n\n二、前期准备：\n1. 制定方案：明确调研时间、地点（2-3个代表村镇）、人员分组、方式（座谈+走访+问卷）；\n2. 组建团队：抽调业务骨干，邀请相关部门同志参与；\n3. 准备材料：设计调查问卷、访谈提纲，收集当地基本数据；\n4. 对接联络：提前与当地乡镇政府对接。\n\n三、实施阶段：\n1. 召开座谈会：邀请村干部、种植大户、返乡创业青年等代表参加；\n2. 入户走访：随机走访若干农户，了解收入变化、政策享受情况、实际困难；\n3. 实地察看：查看特色产业基地、基础设施建设、公共服务配套；\n4. 做好记录：每日整理调研笔记。\n\n四、后期总结：\n1. 撰写调研报告：基本情况、主要做法、存在问题、对策建议；\n2. 附数据统计和典型案例；\n3. 向领导汇报调研成果，提出可操作建议。\n\n五、注意事项：\n轻车简从不增加基层负担；实事求是，不预设结论；注意收集正反两方面案例。'},
-      {id:'default_11',category:CATEGORIES[4],question:'市里要举办一场面向群众的普法宣传活动，领导交给你组织，你如何策划？',answer:'【参考答题思路】\n\n一、明确目标：\n提高群众法律意识，让民法典、反诈骗等法律知识"飞入寻常百姓家"。\n\n二、前期策划：\n1. 确定主题：如"美好生活·民法典相伴"或"守住钱袋子——防范电信诈骗"；\n2. 创新形式：法律知识有奖问答、模拟法庭情景剧、律师现场咨询、宣传展板+短视频播放；\n3. 选定场地和时间：人流量大的广场或社区活动中心，周末上午；\n4. 协调资源：邀请司法局、律师协会、社区志愿者参与。\n\n三、宣传预热：\n通过社区微信群、公众号、海报提前一周宣传，让群众知道时间地点和活动亮点。\n\n四、现场执行：\n1. 设置签到区和引导牌，安排志愿者引导；\n2. 各区域分工明确：咨询区、展示区、互动区、礼品发放区；\n3. 安排摄影摄像留存资料；\n4. 关注现场安全，做好人流疏导和应急准备。\n\n五、活动总结：\n统计参与人数、咨询问题类型、发放材料数量，收集群众反馈，撰写活动简报。'},
-      {id:'default_12',category:CATEGORIES[5],question:'你是社区工作人员，一位大爷因为邻居养狗扰民问题到社区投诉，请你现场模拟如何与大爷沟通。',answer:'【现场模拟】\n\n工作人员："大爷，您先坐下喝口水，别着急，慢慢说。"\n\n（大爷坐下后）\n\n工作人员："大爷，您能跟我说说具体是什么情况吗？是哪家邻居的狗？怎么个扰民法？"\n\n大爷："就是楼上302那家！养了条大狗，半夜叫个不停，我和老伴根本睡不好觉！"\n\n工作人员："我理解了，睡眠不好确实影响身体，换我也受不了。大爷您放心，这件事我们社区一定管。您最近有没有跟302的住户沟通过这个事？"\n\n大爷："说过一次，人家嘴上说注意注意，结果还是老样子！"\n\n工作人员："好的大爷，您反映的情况我记下来了。这样，我接下来做三件事：第一，我今天就去302上门了解情况；第二，我会跟302住户好好沟通；第三，如果他们确实不听劝导，我们社区可以协调派出所民警一起上门。您看这样可以吗？"\n\n大爷："那行，你可得抓紧办啊！"\n\n工作人员："大爷您放心，我这一两天就给您回话。这是我的电话，您记一下，以后有什么事随时找我。"\n\n【思路总结】\n1. 先安抚情绪表达共情；2. 详细了解情况；3. 给出明确的行动承诺和时间表；4. 留下联系方式让群众安心。'},
-      {id:'default_13',category:CATEGORIES[5],question:'你是单位扶贫干部，一位贫困户认为扶贫政策对自己不公平，情绪激动来找你理论，请现场模拟你如何安抚并解释。',answer:'【现场模拟】\n\n扶贫干部："老张，你来了！来来来，先坐。我看你脸色不太好，是不是遇到什么难事了？"\n\n老张："我问你，为啥隔壁老李家能享受低保，我家就不行？我们都是贫困户，凭啥不一样？你们这是欺负人！"\n\n扶贫干部："老张，你说得对，换我看到邻居享受政策我没享受到，心里也会不平衡。你先别急，我当着你的面把政策文件拿出来，咱们一条一条对，看看到底是什么原因，好不好？"\n\n（拿出文件，耐心解释低保认定标准——家庭人均月收入低于XX元且家庭财产符合规定）\n\n扶贫干部："老张，你儿子在外打工收入不稳定这个情况，我们可以重新核算。另外，虽然暂时不符合低保条件，但我们的产业扶贫政策你都能享受——上次说的养殖补贴，还有技术培训，这些我帮你盯着，让你靠自己本事稳定增收，比吃低保强多了是不是？"\n\n老张："那……那你帮我重新算算。还有那个养殖补贴，真能办下来？"\n\n扶贫干部："包在我身上！我今天就帮你填表，明天送到镇上去。老张你放心，扶贫政策是帮真正困难的人，绝不会让老实人吃亏。有消息我第一时间通知你。"\n\n【思路总结】\n1. 共情先行，不急于辩解；2. 摆政策、摆数据，用事实说话；3. 给出解决路径，不只说"不行"还要说"怎么做才行"；4. 让群众看到希望。'},
-      {id:'default_14',category:CATEGORIES[6],question:'请用"担当、创新、奉献"三个词串成一段话，谈谈你对公务员工作的理解。',answer:'【参考答题】\n\n如果让我用这三个词来描述我心中的公务员工作：\n\n公务员首先需要有"担当"——这不是一份朝九晚五的普通职业，而是一份沉甸甸的责任。当群众遇到难事找到你，你不能说"这不归我管"就推出去；当急难险重任务来临时，你必须冲得上去、扛得下来。担当是公务员的底色。\n\n但光有担当还不够，新时代的公务员还需要"创新"。脱贫攻坚中涌现出多少因地制宜的好做法？数字化政务让多少群众少跑了冤枉路？创新不是标新立异，而是用更有效的方法解决老问题，用更便民的思路优化旧流程。\n\n而这一切的背后，是"奉献"精神在支撑。基层公务员加班加点、节假日值守、在田间地头和群众打成一片——没有奉献精神的人干不了这行。奉献不是不计报酬的牺牲，而是一种因热爱而投入、因责任而坚守的职业态度。\n\n所以我理解，公务员工作就是在平凡岗位上，以担当的姿态面对责任，以创新的思维破解难题，以奉献的精神服务人民。三个词合在一起，就是一个合格公务员应有的模样。'},
-      {id:'default_15',category:CATEGORIES[6],question:'（漫画题）画面上一个人站在岔路口，一条路写着"安逸"，一条路写着"奋斗"，请谈谈你的认识。',answer:'【参考答题思路】\n\n一、描述漫画：\n画面中一个人站在人生的岔路口，左边标着"安逸"，道路平坦但一眼望得到头；右边标着"奋斗"，道路崎岖但通向远方。\n\n二、揭示寓意：\n核心矛盾是"舒适区"与"成长区"的抉择。\n\n三、深入分析：\n1. "安逸"的诱惑与代价：短期舒服，长期带来能力停滞，温水煮青蛙；\n2. "奋斗"的艰辛与回报：过程辛苦，但带来成长和眼界跃升，如同登山——过程艰难但山顶风景不同；\n3. 辩证看待：安逸不等于堕落，适度调整是必要的；奋斗也不等于盲目内卷，有方向有方法的努力才有意义。\n\n四、结合公务员考试：\n选择考公本身就是选择了一条"奋斗"之路。我们放弃安逸，选择去基层、去一线、去群众需要的地方，不是因为安逸不好，而是因为用奋斗书写的人生更有分量。\n\n五、总结：\n岔路口的每一次选择都在定义我们成为什么样的人。我愿选择"奋斗"，因为唯有攀登，方能望远。'}
-    ];
+// ============================================================
+//  🔧 替换为你的 Firebase 配置
+// ============================================================
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDcEaMoBcoYCY9pcZLYGJq1zR-VEoe6Y-c",
+  authDomain: "gov-interview-form-claude.firebaseapp.com",
+  databaseURL: "https://gov-interview-form-claude-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "gov-interview-form-claude",
+  storageBucket: "gov-interview-form-claude.firebasestorage.app",
+  messagingSenderId: "307364766696",
+  appId: "1:307364766696:web:04f0da5498bff77b5d7a5d"
+};
+// ============================================================
+
+const CHAPTERS = [
+  { id:1, name:"综合分析类", short:"综合分析", color:"#2f80ed", bg:"#eaf1fd", subs:["态度观点·单观点类","态度观点·双观点类","态度观点·多观点类","社会现象·正面","社会现象·负面","社会现象·辩证","寓言故事","漫画"] },
+  { id:2, name:"人际关系类", short:"人际关系", color:"#27ae60", bg:"#e8f8ef", subs:["与群众的关系","与领导的关系","与同事的关系","与下属的关系","与其他单位的关系","与亲友的关系"] },
+  { id:3, name:"组织策划类", short:"组织策划", color:"#e67e22", bg:"#fdf3e7", subs:["调研","活动培训","宣传","会议","评选"] },
+  { id:4, name:"应急应变类", short:"应急应变", color:"#e74c3c", bg:"#fdecea", subs:["一般性突发事件","公共安全突发事件"] },
+  { id:5, name:"自我认知类", short:"自我认知", color:"#8e44ad", bg:"#f5eefb", subs:["岗位匹配","职业态度","压力应对"] },
+  { id:6, name:"行政实务类", short:"行政实务", color:"#16a085", bg:"#e8f6f3", subs:["公务接待","协调解决","文书起草","事务安排"] },
+  { id:7, name:"情景模拟类", short:"情景模拟", color:"#d35400", bg:"#fdf0e6", subs:["咨询服务","矛盾调解","劝说沟通"] },
+  { id:8, name:"即时表达类", short:"即时表达", color:"#2980b9", bg:"#e8f4fd", subs:["模拟演讲","串词造句","会议发言"] },
+  { id:9, name:"无领导小组讨论", short:"无领导讨论", color:"#c0392b", bg:"#fdebea", subs:["开放式问题","两难问题","多项选择题","排序题","资源争夺题"] },
+];
+const NUMS=['一','二','三','四','五','六','七','八','九'];
+const MASTERY_LABELS={none:"未掌握",learning:"努力中",familiar:"比较熟",mastered:"已掌握"};
+const MASTERY_CLASS={none:"m-none",learning:"m-learning",familiar:"m-familiar",mastered:"m-mastered"};
+const SEED=[
+  {title:"某地出现了一种现象：年轻干部热衷于在办公室加班，却不愿深入基层调研。请谈谈你对这一现象的看法。",chapter:1,sub:"社会现象·负面",tags:["基层调研","作风建设","实干精神"],answer:"一、现象本质：形式主义的变体，表面勤勉实则脱离实际；二、危害：脱离群众，政策落地难；三、原因：考核机制不健全，官僚文化影响；四、建议：完善实绩考核，建立下沉机制，加强教育引导。"},
+  {title:"你和同事共同负责一项重要任务，临近截止前同事告诉你他的部分出了严重问题，可能影响整体完成，你怎么办？",chapter:2,sub:"与同事的关系",tags:["团队协作","应急处置","担当"],answer:"一、第一时间了解具体问题，评估影响范围；二、主动分担，调整分工，优先保证整体任务完成；三、及时向领导汇报，不瞒报；四、事后总结，完善协作机制。"},
+  {title:"领导让你负责组织一次全局年终总结大会，参会人员150人，你如何策划？",chapter:3,sub:"会议",tags:["组织协调","统筹策划","大局意识"],answer:"一、明确会议目标和议程框架；二、提前确认场地、设备、材料准备；三、分工落实，指定专人负责签到、记录、后勤；四、会前彩排，预案突发情况；五、会后整理纪要并跟进落实事项。"},
+  {title:"你刚到新单位，发现同事们私下议论你是靠关系进来的，你如何处理这种情况？",chapter:2,sub:"与同事的关系",tags:["人际关系","新人适应","廉洁自律"],answer:"一、保持平和心态，不急于辩解；二、以实际工作表现证明自己的能力；三、主动融入团队，尊重同事；四、坚守廉洁底线，行得正坐得直。"},
+  {title:"单位突发火灾，你作为当日值班人员，第一时间应该怎么做？",chapter:4,sub:"一般性突发事件",tags:["应急处置","安全意识","服从指挥"],answer:"一、立即拨打119报警，同时启动单位应急预案；二、组织有序疏散人员，优先保障人身安全；三、控制火势蔓延，如条件允许使用灭火器初步处置；四、保护重要档案资料；五、协助消防救援，做好善后记录。"},
+];
+
+const isConfigured=!FIREBASE_CONFIG.apiKey.includes("YOUR_");
+
+// ============================================================
+//  🔑 管理员密码 — 修改此处设置你的密码
+// ============================================================
+const ADMIN_PASSWORD = "admin2024";
+// ============================================================
+
+let isAdmin = false;
+
+function checkAdminState() {
+  // Session-level: admin status resets on page reload for security
+  const badge = document.getElementById("adminBadge");
+  const label = document.getElementById("adminLabel");
+  if (isAdmin) {
+    badge.classList.add("active");
+    badge.title = "已登录为管理员（点击退出）";
+    label.textContent = "管理员";
+    badge.innerHTML = '<span class="lock-icon">🔓</span><span id="adminLabel">管理员</span>';
+  } else {
+    badge.classList.remove("active");
+    badge.title = "点击登录为管理员";
+    badge.innerHTML = '<span class="lock-icon">🔒</span><span id="adminLabel">访客</span>';
   }
+  // Show/hide admin-only elements
+  document.querySelectorAll(".admin-only").forEach(el => {
+    el.style.display = isAdmin ? "" : "none";
+  });
+  renderMain();
+}
 
-  function loadDeleted() { try { var s = localStorage.getItem(SK_DEL); if (s) { var p = JSON.parse(s); if (Array.isArray(p)) return p; } } catch(e) {} return []; }
-  function saveDeleted(d) { try { localStorage.setItem(SK_DEL, JSON.stringify(d)); } catch(e) {} if (syncEnabled && syncUrl) { fetch(syncUrl + '/deleted.json', { method: 'PUT', body: JSON.stringify(d) }).catch(function(){}); } }
-  function loadQuestions() {
-    // 先尝试读本地缓存作为初始值，异步从云端拉取最新数据
-    try { var s = localStorage.getItem(SK_Q); if (s) { var p = JSON.parse(s); if (Array.isArray(p)) return p; } } catch (e) {}
-    // 本地无数据时返回默认题目
-    var d = getDefaultQuestions(); try { localStorage.setItem(SK_Q, JSON.stringify(d)); } catch(e) {} return d;
+window.openAdminAuth = function() {
+  if (isAdmin) {
+    isAdmin = false;
+    showToast("已退出管理员模式");
+    checkAdminState();
+    return;
   }
-  function saveQuestions(d) { try { localStorage.setItem(SK_Q, JSON.stringify(d)); } catch (e) { showToast('存储空间不足，请清理数据或图片'); } if (syncEnabled && syncUrl) { fetch(syncUrl + '/questions.json', { method: 'PUT', body: JSON.stringify(d) }).catch(function(){}); } }
-  function loadNote(id) { try { return localStorage.getItem(SK_N + id) || ''; } catch (e) { return ''; } }
-  function loadNoteCloud(id, cb) { if (!syncEnabled || !syncUrl) return; fetch(syncUrl + '/notes/' + encodeURIComponent(id) + '.json').then(function(r) { return r.json(); }).then(function(v) { if (v !== null && v !== undefined) { var local = loadNote(id); if (v !== local) { saveNote(id, v, true); if (cb) cb(v); } else if (cb) cb(local); } }).catch(function(){}); }
-  function pullQuestionsFromCloud(cb) {
-    if (!syncEnabled || !syncUrl) { if (cb) cb(); return; }
-    fetch(syncUrl + '/questions.json').then(function(r) { return r.json(); }).then(function(data) {
-      fetch(syncUrl + '/deleted.json').then(function(r2) { return r2.json(); }).then(function(dd) { if (Array.isArray(dd)) { deletedQuestions = dd; try { localStorage.setItem(SK_DEL, JSON.stringify(dd)); } catch(e) {} } }).catch(function(){});
-      if (Array.isArray(data) && data.length > 0) {
-        questions = data;
-        try { localStorage.setItem(SK_Q, JSON.stringify(data)); } catch(e) {}
-        renderSidebar(); renderQuestions(); updateHeader();
-        showToast('\u2705 \u540C\u6B65\u5B8C\u6210\uFF1A' + data.length + ' \u9053\u9898\u76EE');
-      } else {
-        showToast('\u4E91\u7AEF\u6682\u65E0\u6570\u636E');
-      }
-      if (cb) cb();
-    }).catch(function() { showToast('\u4E91\u7AEF\u540C\u6B65\u5931\u8D25'); if (cb) cb(); });
+  document.getElementById("adminPwdInput").value = "";
+  document.getElementById("adminError").textContent = "";
+  document.getElementById("adminWall").classList.add("open");
+  setTimeout(() => document.getElementById("adminPwdInput").focus(), 100);
+};
+window.closeAdminAuth = function() {
+  document.getElementById("adminWall").classList.remove("open");
+};
+window.submitAdminPwd = function() {
+  const pwd = document.getElementById("adminPwdInput").value;
+  if (pwd === ADMIN_PASSWORD) {
+    isAdmin = true;
+    document.getElementById("adminWall").classList.remove("open");
+    showToast("管理员模式已开启 ✓");
+    checkAdminState();
+  } else {
+    document.getElementById("adminError").textContent = "密码错误，请重试";
+    document.getElementById("adminPwdInput").value = "";
+    document.getElementById("adminPwdInput").focus();
   }
-  function syncQuestionsFromCloud() { if (!syncEnabled || !syncUrl) return; fetch(syncUrl + '/questions.json').then(function(r) { return r.json(); }).then(function(data) { if (Array.isArray(data) && data.length > 0) { var local = JSON.stringify(questions); if (JSON.stringify(data) !== local) { questions = data; saveQuestionsLocal(data); renderSidebar(); renderQuestions(); } } }).catch(function(){}); }
-  function saveQuestionsLocal(d) { try { localStorage.setItem(SK_Q, JSON.stringify(d)); } catch(e) {} }
-  function syncAllFromCloud() {
-    // 同步题目
-    syncQuestionsFromCloud();
-    // 同步笔记
-    if (!syncEnabled || !syncUrl) return;
-    var f = questions; var count = 0;
-    f.forEach(function(q) { loadNoteCloud(q.id, function(v) { var el = document.getElementById('note_' + q.id); if (el && el.value !== v && !el.dataset.touched) { el.value = v; count++; } }); });
-    if (count > 0) showToast('\u7B14\u8BB0\u540C\u6B65\u5B8C\u6210\uFF1A' + count + ' \u6761');
-  }
-  function saveNote(id, v, skipCloud) { try { localStorage.setItem(SK_N + id, v); } catch (e) {} if (!skipCloud && syncEnabled && syncUrl) { fetch(syncUrl + '/notes/' + encodeURIComponent(id) + '.json', { method: 'PUT', body: JSON.stringify(v) }).catch(function(){}); } }
-  function loadDarkMode() { try { return localStorage.getItem(SK_D) === 'true'; } catch (e) { return false; } }
-  function saveDarkMode(v) { try { localStorage.setItem(SK_D, v ? 'true' : 'false'); } catch (e) {} }
-  function loadCategory() { try { return localStorage.getItem(SK_C) || null; } catch (e) { return null; } }
-  function saveCategory(c) { try { if (c) localStorage.setItem(SK_C, c); else localStorage.removeItem(SK_C); } catch (e) {} }
-  function genId() { return 'q_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9); }
+};
+let db,qRef,trashRef,notesRef,masteryRef,starsRef,wrongRef,statsRef;
+let questions={},trash={},notes={},mastery={},stars={},wrongSet={},practiceStats={};
+let editingId=null,currentView={type:"all",chapter:null,sub:null};
+let expandedId=null,searchQuery="",sortMode="time",filterMastery="all";
+let noteTimers={},navExpanded=new Set();
+let practiceList=[],practiceIdx=0,timerInterval=null,timerSecs=180,answerRevealed=false;
 
-  var questions = [], currentCategory = null, searchQuery = '', editingId = null, pendingDel = null, darkMode = false, noteTimers = {};
-  var syncUrl = '', syncEnabled = false, isAdmin = false, deletedQuestions = [];
+// ── Recording ──
+let mediaRecorder=null,audioChunks=[],isRecording=false;
+// ── STT ──
+let speechRec=null,isSpeaking=false;
+// ── Partner ──
+let roomId=null,myName="",partnerConnected=false,roomRef=null,partnerListener=null;
 
-  function showToast(msg) { var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(function() { t.classList.remove('show'); }, 5000); }
-  function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function todayKey(){return new Date().toISOString().slice(0,10);}
+function setSyncState(s){const p=document.getElementById("syncPill");p.className="sync-pill "+s;p.textContent=s==="ok"?"已同步":s==="syncing"?"同步中…":"离线";}
+function saveLocal(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function getLocal(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch{return d;}}
+function fbSet(p,v){if(isConfigured)set(ref(db,p),v);}
+function fbRemove(p){if(isConfigured)remove(ref(db,p));}
 
-  var HARDCODED_SYNC_URL = 'https://mianshi-bank-fb730-default-rtdb.asia-southeast1.firebasedatabase.app';
-  function loadSyncUrl() {
-    // 优先读用户在界面上设置的URL，否则回退到硬编码默认值
-    try {
-      var stored = localStorage.getItem('interview_bank_sync_url');
-      if (stored && stored !== '') return stored;
-    } catch(e) {}
-    // 首次使用：写入硬编码默认值
-    try { localStorage.setItem('interview_bank_sync_url', HARDCODED_SYNC_URL); } catch(e) {}
-    return HARDCODED_SYNC_URL;
-  }
-  function saveSyncUrl(url) { try { localStorage.setItem('interview_bank_sync_url', url); } catch(e) {} }
-  function initSync() {
-    syncUrl = loadSyncUrl();
-    if (syncUrl) {
-      syncEnabled = true;
-      updateSyncUI();
-      // 启动时强制从云端拉取最新题目（覆盖本地），完成后启动定时器
-      forcePullFromCloud(function() {
-        setInterval(function() { if (syncEnabled) syncQuestionsFromCloud(); }, 30000);
-      });
-    } else {
-      updateSyncUI();
+// ── Nav ──
+function buildNav(){
+  ["all","starred","wrong","stats"].forEach(t=>document.getElementById("nav-"+t)?.classList.toggle("active",currentView.type===t));
+  document.getElementById("navCountAll").textContent=Object.keys(questions).length||"";
+  document.getElementById("navCountStar").textContent=Object.keys(stars).length||"";
+  document.getElementById("navCountWrong").textContent=Object.keys(wrongSet).length||"";
+  document.getElementById("navTree").innerHTML=CHAPTERS.map(ch=>{
+    const cnt=Object.values(questions).filter(q=>q.chapter===ch.id).length;
+    const exp=navExpanded.has(ch.id),act=currentView.type==="chapter"&&currentView.chapter===ch.id&&!currentView.sub;
+    return `<button class="nav-item${act?" active":""}${exp?" expanded":""}" onclick="toggleNav(${ch.id})">
+      <span class="dot" style="background:${ch.color}"></span>第${NUMS[ch.id-1]}章 ${ch.short}
+      <span class="nav-arrow">▶</span><span class="nav-count">${cnt||""}</span>
+    </button>
+    <div class="subnav${exp?" open":""}" id="subnav_${ch.id}">
+      ${ch.subs.map(s=>{
+        const sc=Object.values(questions).filter(q=>q.chapter===ch.id&&q.sub===s).length;
+        const sa=currentView.type==="chapter"&&currentView.chapter===ch.id&&currentView.sub===s;
+        return `<button class="subnav-item${sa?" active":""}" onclick="switchView('chapter',${ch.id},'${encodeURIComponent(s)}')">${s}<span style="margin-left:auto;font-size:11px;color:var(--text3)">${sc||""}</span></button>`;
+      }).join("")}
+    </div>`;
+  }).join("");
+}
+window.toggleNav=function(id){
+  if(navExpanded.has(id)){navExpanded.delete(id);buildNav();}
+  else{navExpanded.add(id);if(currentView.type!=="chapter"||currentView.chapter!==id)switchViewRaw("chapter",id,null);else buildNav();}
+};
+window.switchView=function(type,chapter=null,sub=null){if(sub)sub=decodeURIComponent(sub);switchViewRaw(type,chapter,sub);};
+function switchViewRaw(type,chapter,sub){
+  currentView={type,chapter,sub};if(chapter)navExpanded.add(chapter);
+  expandedId=null;searchQuery="";document.getElementById("searchInput").value="";
+  buildNav();renderMain();if(window.innerWidth<=768)closeSidebar();
+}
+function updateToolbar(){
+  const show=["all","chapter","starred","wrong"].includes(currentView.type);
+  document.getElementById("randomBtn").style.display=show?"":"none";
+  document.getElementById("practiceAllBtn").style.display=show?"":"none";
+}
+
+// ── Render main ──
+function renderMain(){
+  updateToolbar();
+  const el=document.getElementById("mainContent");
+  if(currentView.type==="trash"){renderTrash();return;}
+  if(currentView.type==="stats"){renderStats();return;}
+  if(currentView.type==="import"){renderImport();return;}
+  let list=Object.entries(questions);
+  if(currentView.type==="chapter")list=list.filter(([,q])=>q.chapter===currentView.chapter&&(!currentView.sub||q.sub===currentView.sub));
+  if(currentView.type==="starred")list=list.filter(([id])=>stars[id]);
+  if(currentView.type==="wrong")list=list.filter(([id])=>wrongSet[id]);
+  if(searchQuery){const sq=searchQuery.toLowerCase();list=list.filter(([,q])=>q.title?.toLowerCase().includes(sq)||q.answer?.toLowerCase().includes(sq));}
+  if(filterMastery!=="all")list=list.filter(([id])=>(mastery[id]||"none")===filterMastery);
+  if(sortMode==="time")list.sort(([,a],[,b])=>(b.createdAt||0)-(a.createdAt||0));
+  else if(sortMode==="mastery"){const ord={none:0,learning:1,familiar:2,mastered:3};list.sort(([ia],[ib])=>(ord[mastery[ia]||"none"])-(ord[mastery[ib]||"none"]));}
+  else if(sortMode==="chapter")list.sort(([,a],[,b])=>a.chapter-b.chapter||(a.sub||"").localeCompare(b.sub||""));
+  let title="全部题目";
+  if(currentView.type==="starred")title="⭐ 已收藏";
+  else if(currentView.type==="wrong")title="📌 错题本";
+  else if(currentView.type==="chapter"){const ch=CHAPTERS.find(c=>c.id===currentView.chapter);title=ch?`第${NUMS[ch.id-1]}章 ${ch.name}`:"";if(currentView.sub)title+=" · "+currentView.sub;}
+  document.getElementById("topbarTitle").textContent=title;
+  document.getElementById("mobileTitleBar").textContent=title;
+  let html="";
+  if(currentView.type==="chapter"&&!currentView.sub){
+    const ch=CHAPTERS.find(c=>c.id===currentView.chapter);
+    if(ch){
+      const total=Object.values(questions).filter(q=>q.chapter===ch.id).length;
+      const mast=Object.entries(questions).filter(([id,q])=>q.chapter===ch.id&&mastery[id]==="mastered").length;
+      html+=`<div class="chapter-banner" style="background:${ch.bg};border-color:${ch.color}22">
+        <div style="font-size:24px">📖</div>
+        <div class="chapter-info" style="flex:1"><h2 style="color:${ch.color}">第${NUMS[ch.id-1]}章 ${ch.name}</h2>
+        <p>${total} 题 · 已掌握 ${mast} 题（${total?Math.round(mast/total*100):0}%）</p></div>
+      </div>
+      <div class="filter-row">${ch.subs.map(s=>`<button class="pill${currentView.sub===s?" active":""}" onclick="switchView('chapter',${ch.id},'${encodeURIComponent(s)}')">${s}</button>`).join("")}</div>`;
     }
   }
-  // 强制从云端拉取并覆盖本地，无论本地是否有缓存
-  function forcePullFromCloud(cb) {
-    if (!syncEnabled || !syncUrl) { if (cb) cb(); return; }
-    fetch(syncUrl + '/questions.json')
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (Array.isArray(data) && data.length > 0) {
-          questions = data;
-          try { localStorage.setItem(SK_Q, JSON.stringify(data)); } catch(e) {}
-          fetch(syncUrl + '/deleted.json').then(function(r){return r.json();}).then(function(dd){ if(Array.isArray(dd)){deletedQuestions=dd; try{localStorage.setItem(SK_DEL,JSON.stringify(dd));}catch(e){}} }).catch(function(){});
-          renderSidebar(); renderQuestions(); updateHeader();
-        }
-        if (cb) cb();
-      })
-      .catch(function() { if (cb) cb(); });
-  }
-  function updateSyncUI() { var btn = document.getElementById('syncLabel'); if (!btn) return; if (syncEnabled) { btn.innerHTML = '\u2601\uFE0F \u5DF2\u540C\u6B65'; testSyncReachability(); } else { btn.innerHTML = '\u2601\uFE0F \u4E91\u540C\u6B65\uFF08\u70B9\u51FB\u914D\u7F6E\uFF09'; } }
-  function syncNow() { if (syncEnabled) { syncAllFromCloud(); showToast('\u6B63\u5728\u540C\u6B65…'); testSyncReachability(); } }
-  function checkStorageQuota() { try { var used = JSON.stringify(localStorage).length; var limit = 5242880; if (used > limit * 0.8) { showToast('存储空间不足(已用' + Math.round(used/1024) + 'KB)，建议清理图片'); } } catch(e) {} }
-  function testSyncReachability() { if (!syncUrl) return; var lb = document.getElementById('syncLabel'); fetch(syncUrl + '/.json').then(function(r) { if (lb) lb.innerHTML = r.ok ? '\u2601\uFE0F \u5DF2\u540C\u6B65' : '\u2601\uFE0F \u8FDE\u63A5\u5931\u8D25(' + r.status + ')'; }).catch(function() { if (lb) lb.innerHTML = '\u2601\uFE0F \u65E0\u6CD5\u8FDE\u63A5'; }); }
+  html+=`<div class="list-toolbar">
+    <span class="toolbar-label">${list.length} 题</span><div style="flex:1"></div>
+    <span class="toolbar-label">掌握程度</span>
+    <select class="filter-select" onchange="setFilterMastery(this.value)">
+      <option value="all"${filterMastery==="all"?" selected":""}>全部</option>
+      <option value="none"${filterMastery==="none"?" selected":""}>未掌握</option>
+      <option value="learning"${filterMastery==="learning"?" selected":""}>努力中</option>
+      <option value="familiar"${filterMastery==="familiar"?" selected":""}>比较熟</option>
+      <option value="mastered"${filterMastery==="mastered"?" selected":""}>已掌握</option>
+    </select>
+    <span class="toolbar-label">排序</span>
+    <div class="seg-ctrl">
+      <button class="seg-btn${sortMode==="time"?" active":""}" onclick="setSort('time')">时间</button>
+      <button class="seg-btn${sortMode==="mastery"?" active":""}" onclick="setSort('mastery')">掌握度</button>
+      <button class="seg-btn${sortMode==="chapter"?" active":""}" onclick="setSort('chapter')">章节</button>
+    </div>
+  </div>`;
+  if(!list.length){html+=`<div class="empty"><div class="empty-icon">📭</div><div>暂无题目</div></div>`;el.innerHTML=html;return;}
+  html+=`<table class="q-table"><thead><tr><th style="width:32px">#</th><th style="width:28px"></th><th>题目</th><th style="width:150px"></th></tr></thead><tbody>`;
+  list.forEach(([id,q],i)=>{
+    const ch=CHAPTERS.find(c=>c.id===q.chapter);
+    const color=ch?.color||"#666",bg=ch?.bg||"#f5f5f5";
+    const tags=(q.tags||[]).map(t=>`<span class="tag-sm" style="background:${bg};color:${color}">${t}</span>`).join("");
+    const subTag=q.sub?`<span class="tag-sm" style="background:${bg};color:${color}">${q.sub}</span>`:"";
+    const mv=mastery[id]||"none",starred=!!stars[id],isWrong=!!wrongSet[id];
+    const mBadge=mv!=="none"?`<span class="mastery-badge ${MASTERY_CLASS[mv]}">${MASTERY_LABELS[mv]}</span>`:"";
+    const wrongMark=isWrong?`<span style="font-size:11px">📌</span>`:"";
+    html+=`<tr class="q-row" id="qrow_${id}" onclick="toggleExpand('${id}')">
+      <td class="q-num">${i+1}</td>
+      <td class="star-cell"><button class="star-btn${starred?" starred":""}" onclick="event.stopPropagation();toggleStar('${id}')">${starred?"★":"☆"}</button></td>
+      <td class="q-title-cell">${q.title}<div class="q-meta">${subTag}${tags}${mBadge}${wrongMark}</div></td>
+      <td class="q-actions-cell"><div class="q-actions" onclick="event.stopPropagation()">
+        <button class="act-btn practice-btn" onclick="startPracticeOne('${id}')">练习</button>
+        <button class="act-btn" onclick="openEdit('${id}')">编辑</button>
+        <button class="act-btn del" onclick="moveToTrash('${id}')">删除</button>
+      </div></td>
+    </tr>`;
+    if(expandedId===id){
+      html+=`<tr class="expand-row"><td colspan="4"><div class="expand-inner">
+        <div class="expand-section"><div class="expand-label">参考要点</div>
+          <div class="expand-answer">${(q.answer||"—").replace(/；/g,"；<br>")}</div></div>
+        <div class="expand-section"><div class="expand-label">掌握程度</div>
+          <div class="mastery-row">${["none","learning","familiar","mastered"].map(m=>`<button class="mastery-opt${(mastery[id]||"none")===m?" active-"+m:""}" onclick="setMastery('${id}','${m}')">${MASTERY_LABELS[m]}</button>`).join("")}</div></div>
+        <div class="expand-section expand-note">
+          <div class="expand-label"><span>随笔笔记</span><span class="note-saved" id="ns_${id}">✓ 已保存</span></div>
+          <textarea id="note_${id}" placeholder="记录答题思路、补充要点…" oninput="noteInput('${id}')">${notes[id]||""}</textarea>
+        </div>
+      </div></td></tr>`;
+    }
+  });
+  html+=`</tbody></table>`;
+  el.innerHTML=html;
+}
 
-  function applyDarkMode(v) {
-    darkMode = v;
-    if (v) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark');
-    var icon = document.getElementById('darkIcon'), label = document.getElementById('darkModeLabel');
-    if (v) { icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>'; label.textContent = '护眼模式'; }
-    else { icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>'; label.textContent = '暗黑模式'; }
-    saveDarkMode(v);
-  }
-  function toggleDarkMode() { applyDarkMode(!darkMode); }
+// ── Stats ──
+function renderStats(){
+  document.getElementById("topbarTitle").textContent="学习统计";
+  document.getElementById("mobileTitleBar").textContent="学习统计";
+  const total=Object.keys(questions).length;
+  const masteredCnt=Object.values(mastery).filter(m=>m==="mastered").length;
+  const practiced=Object.values(practiceStats).reduce((a,b)=>a+(b||0),0);
+  const streak=calcStreak();
+  let html=`<div class="section-title">整体概览</div>
+  <div class="stats-grid">
+    <div class="stats-big-card"><div class="stats-big-val">${total}</div><div class="stats-big-label">题库总题数</div></div>
+    <div class="stats-big-card"><div class="stats-big-val" style="color:var(--green)">${masteredCnt}</div><div class="stats-big-label">已掌握题数</div><div style="font-size:11px;color:var(--text3)">${total?Math.round(masteredCnt/total*100):0}%</div></div>
+    <div class="stats-big-card"><div class="stats-big-val" style="color:#f59e0b">${Object.keys(stars).length}</div><div class="stats-big-label">收藏题数</div></div>
+    <div class="stats-big-card"><div class="stats-big-val">${practiced}</div><div class="stats-big-label">累计练习次数</div></div>
+    <div class="stats-big-card"><div class="stats-big-val"><span class="streak-flame">🔥</span>${streak}</div><div class="stats-big-label">连续打卡天数</div></div>
+    <div class="stats-big-card"><div class="stats-big-val" style="color:var(--red)">${Object.keys(wrongSet).length}</div><div class="stats-big-label">错题本题数</div></div>
+  </div>
+  <div class="section-title">各章节掌握情况</div>
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-bottom:24px">
+    ${CHAPTERS.map(ch=>{
+      const ct=Object.values(questions).filter(q=>q.chapter===ch.id).length;
+      const cm=Object.entries(questions).filter(([id,q])=>q.chapter===ch.id&&mastery[id]==="mastered").length;
+      const pct=ct?Math.round(cm/ct*100):0;
+      return `<div class="ch-prog-row"><span class="ch-prog-name">第${NUMS[ch.id-1]}章 ${ch.short}</span>
+        <div class="ch-prog-bar-wrap"><div class="ch-prog-bar" style="width:${pct}%;background:${ch.color}"></div></div>
+        <span class="ch-prog-pct">${pct}%</span></div>`;
+    }).join("")}
+  </div>
+  <div class="section-title">最近 28 天练习记录</div>
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px 20px">
+    <div class="cal-grid">${renderCal()}</div>
+  </div>`;
+  document.getElementById("mainContent").innerHTML=html;
+}
+function renderCal(){
+  const today=todayKey();let h="";
+  for(let i=27;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.toISOString().slice(0,10);h+=`<div class="${k===today?"cal-cell today":practiceStats[k]?"cal-cell practiced":"cal-cell"}" title="${k}"></div>`;}
+  return h;
+}
+function calcStreak(){let s=0,d=new Date();while(true){const k=d.toISOString().slice(0,10);if(!practiceStats[k])break;s++;d.setDate(d.getDate()-1);}return s;}
 
-  function toggleSidebar() { var s = document.getElementById('sidebar'), b = document.getElementById('sidebarBackdrop'); if (s.classList.contains('open')) closeSidebar(); else { s.classList.add('open'); b.classList.add('active'); } }
-  function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarBackdrop').classList.remove('active'); }
-
-  function escHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-  function escAttr(s) { return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-
-  function renderSidebar() {
-    var list = document.getElementById('categoryList'), counts = {};
-    questions.forEach(function(q) { counts[q.category] = (counts[q.category] || 0) + 1; });
-    var h = '<button onclick="selectCategory(null)" class="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors flex items-center justify-between ' + (currentCategory === null ? 'bg-white/15 text-white font-medium' : 'text-white/70 hover:bg-white/8 hover:text-white') + '"><span>\u{1F4CB} 全部题目</span><span class="text-xs ' + (currentCategory === null ? 'text-white/70' : 'text-white/40') + '">' + questions.length + '</span></button>';
-    CATEGORIES.forEach(function(c) {
-      var n = counts[c] || 0, act = currentCategory === c;
-      h += '<button onclick="selectCategory(\'' + escAttr(c) + '\')" class="w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors flex items-center justify-between ' + (act ? 'bg-white/15 text-white font-medium' : 'text-white/70 hover:bg-white/8 hover:text-white') + '"><span>' + escHtml(c) + '</span><span class="text-xs ' + (act ? 'text-white/70' : 'text-white/40') + '">' + n + '</span></button>';
+// ── Import/Export ──
+function renderImport(){
+  document.getElementById("topbarTitle").textContent="导入 / 导出";
+  document.getElementById("mainContent").innerHTML=`<div style="max-width:540px">
+    <div class="section-title">导出题库</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">将当前所有题目导出为 JSON 备份文件。</p>
+    <button class="topbar-btn btn-dark" onclick="exportJSON()" style="margin-bottom:28px">⬇ 导出 JSON</button>
+    <div class="section-title">导入题目</div>
+    <div class="import-drop" onclick="document.getElementById('importFile').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleDrop(event)">
+      <div style="font-size:28px;margin-bottom:8px">📂</div>
+      <div style="font-size:13px">点击或拖拽 JSON 文件</div>
+    </div>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleFileImport(this)">
+  </div>`;
+}
+window.exportJSON=function(){
+  if(!isAdmin){showToast("请先登录管理员账号");openAdminAuth();return;}
+  const data={version:2,exportedAt:new Date().toISOString(),questions:Object.entries(questions).map(([id,q])=>({...q,id,mastery:mastery[id]||"none",starred:!!stars[id],note:notes[id]||""}))};
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download=`面试题库_${todayKey()}.json`;a.click();showToast("导出成功 ✓");
+};
+window.handleDrop=function(e){e.preventDefault();document.querySelector(".import-drop")?.classList.remove("drag-over");const f=e.dataTransfer.files[0];if(f)readImportFile(f);};
+window.handleFileImport=function(i){const f=i.files[0];if(f)readImportFile(f);};
+function readImportFile(file){
+  if(!isAdmin){showToast("请先登录管理员账号");openAdminAuth();return;}
+  const r=new FileReader();r.onload=e=>{try{
+    const data=JSON.parse(e.target.result),qs=data.questions||data;if(!Array.isArray(qs))throw 0;
+    let cnt=0;qs.forEach(q=>{if(!q.title)return;const id="q"+Date.now()+Math.random().toString(36).slice(2);
+      const obj={title:q.title,chapter:q.chapter||1,sub:q.sub||"",tags:q.tags||[],answer:q.answer||"",createdAt:q.createdAt||Date.now()};
+      if(isConfigured){const r2=push(qRef);set(r2,obj);}else questions[id]=obj;
+      if(q.mastery&&q.mastery!=="none"){mastery[id]=q.mastery;saveLocal("mastery",mastery);}
+      if(q.starred){stars[id]=true;saveLocal("stars",stars);}
+      if(q.note){notes[id]=q.note;saveLocal("notes",notes);}
+      cnt++;
     });
-    list.innerHTML = h;
-    var tc = document.getElementById('trashCount'); if (tc) tc.textContent = deletedQuestions.length;
-  }
+    if(!isConfigured){saveLocal("qbank",questions);buildNav();renderMain();}
+    showToast(`成功导入 ${cnt} 道题 ✓`);
+  }catch{showToast("文件格式错误");}};r.readAsText(file);
+}
 
-  function selectCategory(c) { currentCategory = c; saveCategory(c); closeSidebar(); renderSidebar(); renderQuestions(); updateHeader(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-  function handleSearch(v) { searchQuery = v.trim(); renderQuestions(); updateHeader(); }
+// ── Trash ──
+function renderTrash(){
+  document.getElementById("topbarTitle").textContent="回收站";
+  const list=Object.entries(trash).sort(([,a],[,b])=>(b.deletedAt||0)-(a.deletedAt||0));
+  const el=document.getElementById("mainContent");
+  if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-icon">🗑</div><div>回收站为空</div></div>`;return;}
+  el.innerHTML=list.map(([id,q])=>{const ch=CHAPTERS.find(c=>c.id===q.chapter);return `<div class="trash-item">
+    <div class="trash-item-text">${q.title}<div class="trash-item-sub">${ch?`第${NUMS[ch.id-1]}章 ${ch.name}`:""}${q.sub?" · "+q.sub:""}</div></div>
+    <div style="display:flex;gap:6px"><button class="btn btn-ghost" style="font-size:12px;padding:5px 10px" onclick="restoreQ('${id}')">恢复</button>
+    <button class="btn btn-ghost" style="font-size:12px;padding:5px 10px;color:var(--red);border-color:#fca5a5" onclick="permDelete('${id}')">彻底删除</button></div>
+  </div>`;}).join("");
+}
 
-  function getFiltered() {
-    var f = questions;
-    if (currentCategory) f = f.filter(function(q) { return q.category === currentCategory; });
-    if (searchQuery) { var q = searchQuery.toLowerCase(); f = f.filter(function(i) { return i.question.toLowerCase().indexOf(q) !== -1 || i.category.toLowerCase().indexOf(q) !== -1; }); }
-    return f;
-  }
+// ── Practice ──
+function getFilteredList(){
+  let l=Object.entries(questions);
+  if(currentView.type==="chapter")l=l.filter(([,q])=>q.chapter===currentView.chapter&&(!currentView.sub||q.sub===currentView.sub));
+  if(currentView.type==="starred")l=l.filter(([id])=>stars[id]);
+  if(currentView.type==="wrong")l=l.filter(([id])=>wrongSet[id]);
+  return l;
+}
+window.startPractice=function(){const l=getFilteredList();if(!l.length){showToast("当前没有题目");return;}openPractice(l.map(([id])=>id));};
+window.startPracticeOne=function(id){openPractice([id]);};
+window.startRandom=function(){const l=getFilteredList();if(!l.length){showToast("当前没有题目");return;}openPractice([l[Math.floor(Math.random()*l.length)][0]]);};
 
-  function updateHeader() {
-    var t = document.getElementById('currentCategoryTitle'), c = document.getElementById('questionCount'), f = getFiltered();
-    if (searchQuery) { t.textContent = '搜索结果'; c.textContent = '\u627E\u5230 ' + f.length + ' \u9053\u76F8\u5173\u9898\u76EE'; }
-    else if (currentCategory) { t.textContent = currentCategory; c.textContent = '\u5171 ' + f.length + ' \u9053\u9898\u76EE'; }
-    else { t.textContent = '\u5168\u90E8\u9898\u76EE'; c.textContent = '\u5171 ' + f.length + ' \u9053\u9898\u76EE'; }
-  }
+function openPractice(ids){
+  practiceList=ids;practiceIdx=0;answerRevealed=false;
+  stopRecord();stopSTT();
+  document.getElementById("practiceOverlay").classList.add("open");
+  loadPracticeQ();
+}
+window.closePractice=function(){
+  document.getElementById("practiceOverlay").classList.remove("open");
+  clearInterval(timerInterval);stopRecord();stopSTT();
+};
+function loadPracticeQ(){
+  answerRevealed=false;clearInterval(timerInterval);stopRecord();stopSTT();
+  document.getElementById("audioPlayback").classList.remove("show");
+  const id=practiceList[practiceIdx],q=questions[id];if(!q)return;
+  const total=practiceList.length;
+  document.getElementById("practiceBar").style.width=((practiceIdx+1)/total*100)+"%";
+  document.getElementById("practiceCounter").textContent=`${practiceIdx+1}/${total}`;
+  document.getElementById("pSubCounter").textContent=CHAPTERS.find(c=>c.id===q.chapter)?`第${NUMS[q.chapter-1]}章 ${q.sub||""}` :"";
+  document.getElementById("practiceQ").textContent=q.title;
+  document.getElementById("practiceNote").value=notes[id]||"";
+  document.getElementById("practiceAnswerText").innerHTML=(q.answer||"—").replace(/；/g,"；<br>");
+  document.getElementById("answerSection").classList.add("answer-hidden");
+  document.getElementById("revealBtn").style.display="";
+  document.getElementById("prevBtn").style.display=practiceIdx>0?"":"none";
+  document.getElementById("nextBtn").textContent=practiceIdx===total-1?"完成练习 ✓":"下一题 →";
+  document.getElementById("aiReviewBox").classList.remove("show");
+  document.getElementById("aiReviewContent").textContent="";
+  // Mastery
+  const mv=mastery[id]||"none";
+  ["none","learning","familiar","mastered"].forEach((m,i)=>{const b=document.getElementById("pm"+i);b.className="mastery-opt";if(mv===m)b.classList.add("active-"+m);});
+  // Wrong
+  const wb=document.getElementById("wrongBtn");wb.classList.toggle("active",!!wrongSet[id]);wb.textContent=wrongSet[id]?"📌 已在错题本":"📌 加入错题本";
+  // AI btn
+  updateAIBtn();
+  // Timer
+  timerSecs=180;updateTimerDisplay();
+  timerInterval=setInterval(()=>{timerSecs--;updateTimerDisplay();if(timerSecs<=0)clearInterval(timerInterval);},1000);
+  // Stats
+  const tk=todayKey();practiceStats[tk]=(practiceStats[tk]||0)+1;
+  fbSet("practiceStats/"+tk,practiceStats[tk]);saveLocal("practiceStats",practiceStats);
+}
+function updateTimerDisplay(){
+  const m=Math.floor(timerSecs/60),s=timerSecs%60;
+  const el=document.getElementById("timerDisplay");
+  el.textContent=`⏱ ${m}:${String(s).padStart(2,"0")}`;
+  el.className="timer-display"+(timerSecs<=30?" warning":"");
+}
+window.revealAnswer=function(){
+  answerRevealed=true;
+  document.getElementById("answerSection").classList.remove("answer-hidden");
+  document.getElementById("revealBtn").style.display="none";
+  const id=practiceList[practiceIdx],txt=document.getElementById("practiceNote").value;
+  if(txt){notes[id]=txt;fbSet("notes/"+id,txt);saveLocal("notes",notes);}
+  updateAIBtn();
+};
+window.nextPractice=function(){
+  const id=practiceList[practiceIdx],txt=document.getElementById("practiceNote").value;
+  if(txt){notes[id]=txt;fbSet("notes/"+id,txt);saveLocal("notes",notes);}
+  if(practiceIdx>=practiceList.length-1){closePractice();showToast("练习完成！");renderMain();return;}
+  practiceIdx++;loadPracticeQ();
+};
+window.prevPractice=function(){if(practiceIdx<=0)return;practiceIdx--;loadPracticeQ();};
+window.setPracticeMastery=function(m){
+  const id=practiceList[practiceIdx];mastery[id]=m;fbSet("mastery/"+id,m);saveLocal("mastery",mastery);
+  ["none","learning","familiar","mastered"].forEach((mv,i)=>{const b=document.getElementById("pm"+i);b.className="mastery-opt";if(mv===m)b.classList.add("active-"+mv);});
+};
+window.toggleWrong=function(){
+  const id=practiceList[practiceIdx],wb=document.getElementById("wrongBtn");
+  if(wrongSet[id]){delete wrongSet[id];fbRemove("wrong/"+id);wb.classList.remove("active");wb.textContent="📌 加入错题本";}
+  else{wrongSet[id]=true;fbSet("wrong/"+id,true);wb.classList.add("active");wb.textContent="📌 已在错题本";}
+  saveLocal("wrong",wrongSet);
+};
 
-  function renderQuestions() {
-    var container = document.getElementById('questionList'), empty = document.getElementById('emptyState'), f = getFiltered();
-    updateHeader();
-    if (f.length === 0) { container.innerHTML = ''; empty.classList.remove('hidden'); return; }
-    empty.classList.add('hidden');
-    container.innerHTML = f.map(function(q) { return renderCard(q); }).join('');
-    f.forEach(function(q) {
-      var ne = document.getElementById('note_' + q.id);
-      if (ne) { ne.value = loadNote(q.id); ne.addEventListener('input', function() { if (!this.dataset.touched) this.dataset.touched = '1'; handleNoteInput(q.id, this.value); }); }
+// ── Recording ──
+window.toggleRecord=async function(){
+  if(isRecording){stopRecord();return;}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    audioChunks=[];mediaRecorder=new MediaRecorder(stream);
+    mediaRecorder.ondataavailable=e=>audioChunks.push(e.data);
+    mediaRecorder.onstop=()=>{
+      const blob=new Blob(audioChunks,{type:"audio/webm"});
+      const url=URL.createObjectURL(blob);
+      document.getElementById("audioPlayer").src=url;
+      document.getElementById("audioPlayback").classList.add("show");
+      stream.getTracks().forEach(t=>t.stop());
+    };
+    mediaRecorder.start();isRecording=true;
+    const btn=document.getElementById("recBtn");btn.classList.add("recording");btn.innerHTML=`<span class="rec-dot"></span>停止录音`;
+  }catch{showToast("无法访问麦克风，请检查权限");}
+};
+function stopRecord(){
+  if(mediaRecorder&&isRecording){try{mediaRecorder.stop();}catch{}}
+  isRecording=false;
+  const btn=document.getElementById("recBtn");if(btn){btn.classList.remove("recording");btn.innerHTML=`<span class="rec-dot"></span>开始录音`;}
+}
+
+// ── STT ──
+window.toggleSTT=function(){
+  if(isSpeaking){stopSTT();return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){showToast("当前浏览器不支持语音识别，推荐使用 Chrome");return;}
+  speechRec=new SR();speechRec.lang="zh-CN";speechRec.continuous=true;speechRec.interimResults=true;
+  speechRec.onresult=e=>{
+    const ta=document.getElementById("practiceNote");
+    let interim="",final="";
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    if(final)ta.value+=(ta.value&&!ta.value.endsWith("，")&&!ta.value.endsWith("。")?"，":"")+final;
+  };
+  speechRec.onerror=()=>{stopSTT();showToast("语音识别出错，请重试");};
+  speechRec.onend=()=>{if(isSpeaking)speechRec.start();};
+  speechRec.start();isSpeaking=true;
+  const btn=document.getElementById("sttBtn");btn.classList.add("listening");btn.textContent="🔴 停止";
+};
+function stopSTT(){
+  if(speechRec){try{speechRec.stop();}catch{}}isSpeaking=false;
+  const btn=document.getElementById("sttBtn");if(btn){btn.classList.remove("listening");btn.textContent="🎙 语音转文字";}
+}
+
+// ── AI Review ──
+function updateAIBtn(){
+  const key=getLocal("anthropicKey","");
+  const notice=document.getElementById("apiNotice");
+  const btn=document.getElementById("aiReviewBtn");
+  if(!key){notice.classList.add("show");btn.disabled=true;}
+  else{notice.classList.remove("show");btn.disabled=!answerRevealed;}
+}
+window.requestAIReview=async function(){
+  const id=practiceList[practiceIdx],q=questions[id];if(!q)return;
+  const myAnswer=document.getElementById("practiceNote").value.trim();
+  const key=getLocal("anthropicKey","");
+  if(!key){showToast("请先配置 API Key");return;}
+  if(!myAnswer){showToast("请先在「你的思路」里写下答题要点");return;}
+  const btn=document.getElementById("aiReviewBtn");
+  btn.disabled=true;btn.textContent="✦ AI 分析中…";
+  const box=document.getElementById("aiReviewBox"),content=document.getElementById("aiReviewContent");
+  box.classList.add("show");content.textContent="正在分析…";
+  const prompt=`你是一位国家公务员考试结构化面试的专业考官，请对以下答题进行点评。
+
+题目：${q.title}
+
+参考要点：${q.answer}
+
+考生作答：${myAnswer}
+
+请从以下维度给出评价（总分100分）：
+1. 内容完整性（30分）：是否涵盖核心要点
+2. 逻辑条理性（25分）：思路是否清晰有层次
+3. 政治立场（20分）：是否体现正确价值观
+4. 语言表达（15分）：表达是否准确简练
+5. 创新亮点（10分）：是否有独到见解
+
+请给出：总分、各项得分、优点、需改进之处、改进建议（简洁，控制在300字内）。`;
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:600,messages:[{role:"user",content:prompt}]})
     });
+    const data=await res.json();
+    if(data.error){throw new Error(data.error.message);}
+    content.textContent=data.content[0].text;
+  }catch(e){
+    content.textContent="点评失败："+e.message+"\n\n请检查 API Key 是否正确，或网络是否正常。";
   }
+  btn.disabled=false;btn.textContent="✦ 重新点评";
+};
 
-  function renderCard(q) {
-    var ci = CATEGORIES.indexOf(q.category);
-    var cls = ['bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300','bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300','bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300','bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300','bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300','bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300','bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300'];
-    var cc = cls[ci] || cls[0];
-    var h = '<div class="question-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden" id="card_' + q.id + '">';
-    h += '<div class="px-5 md:px-6 pt-5 pb-3"><div class="flex items-start justify-between gap-3 mb-3"><span class="inline-block px-2.5 py-1 text-xs font-medium rounded-md ' + cc + ' whitespace-nowrap shrink-0">' + escHtml(q.category) + '</span><div class="admin-only flex items-center gap-1 shrink-0"><button onclick="openEditModal(\'' + q.id + '\')" title="\u7F16\u8F91" class="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button><button onclick="confirmDelete(\'' + q.id + '\')" title="\u5220\u9664" class="p-1.5 rounded-md hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors text-gray-400 hover:text-red-500 dark:hover:text-red-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></div></div><p class="text-gray-800 dark:text-gray-100 leading-relaxed text-[15px]">' + escHtml(q.question) + '</p>' + (q.image ? '<img src="' + escAttr(q.image) + '" alt="题目图片" onclick="openLightbox(this.src)" style="cursor:zoom-in" class="mt-3 rounded-lg max-w-full max-h-72 object-contain border border-gray-200 dark:border-gray-600" onerror="this.style.display=\'none\'">' : '') + '</div>';
-    h += '<div class="px-5 md:px-6 border-t border-gray-100 dark:border-gray-700/50"><button onclick="toggleAnswer(\'' + q.id + '\')" class="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-navy-700 dark:text-blue-400 hover:text-navy-900 dark:hover:text-blue-300 transition-colors group"><span id="answerBtnText_' + q.id + '">\u70B9\u51FB\u67E5\u770B\u53C2\u8003\u7B54\u6848</span><svg id="answerBtnIcon_' + q.id + '" class="w-4 h-4 transition-transform duration-300 group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button><div id="answerBody_' + q.id + '" class="answer-body border-t border-gray-100 dark:border-gray-700/50"><div class="flex items-center justify-between mb-3"><span class="text-xs font-medium text-gray-500 dark:text-gray-400">\u{1F4DD} \u53C2\u8003\u7B54\u6848</span><button onclick="copyAnswer(\'' + q.id + '\')" class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-navy-700 dark:hover:text-blue-400 transition-colors px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>\u590D\u5236</button></div><div id="answerContent_' + q.id + '" class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">' + escHtml(q.answer || '\u6682\u65E0\u53C2\u8003\u7B54\u6848') + '</div></div></div>';
-    h += '<div class="px-5 md:px-6 pb-5 pt-3 border-t border-gray-100 dark:border-gray-700/50"><div class="flex items-center gap-2 mb-2"><svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg><span class="text-xs font-medium text-gray-500 dark:text-gray-400">\u4E2A\u4EBA\u7B14\u8BB0\uFF08\u81EA\u52A8\u4FDD\u5B58\uFF09</span></div><textarea id="note_' + q.id + '" rows="2" placeholder="\u5728\u8FD9\u91CC\u5199\u5907\u8003\u5FC3\u5F97\u3001\u7B54\u9898\u8BDD\u672F\u3001\u4EAE\u70B9\u91D1\u53E5\u2026" class="note-textarea w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 focus:border-navy-400 dark:focus:border-blue-500 focus:ring-1 focus:ring-navy-400 dark:focus:ring-blue-500"></textarea></div></div>';
-    return h;
-  }
+// ── API Key Modal ──
+window.openApiKeyModal=function(){
+  document.getElementById("apiKeyInput").value=getLocal("anthropicKey","")||"";
+  document.getElementById("apiKeyModal").classList.add("open");
+};
+window.closeApiKeyModal=function(){document.getElementById("apiKeyModal").classList.remove("open");};
+window.saveApiKey=function(){
+  const k=document.getElementById("apiKeyInput").value.trim();
+  saveLocal("anthropicKey",k);closeApiKeyModal();showToast(k?"API Key 已保存 ✓":"已清除 API Key");
+};
 
-  function toggleAnswer(id) {
-    var body = document.getElementById('answerBody_' + id), bt = document.getElementById('answerBtnText_' + id), bi = document.getElementById('answerBtnIcon_' + id);
-    if (body.classList.contains('open')) { body.classList.remove('open'); bt.textContent = '\u70B9\u51FB\u67E5\u770B\u53C2\u8003\u7B54\u6848'; bi.style.transform = 'rotate(0deg)'; }
-    else { body.classList.add('open'); bt.textContent = '\u6536\u8D77\u53C2\u8003\u7B54\u6848'; bi.style.transform = 'rotate(180deg)'; }
-  }
+// ── Partner (搭档对练) ──
+window.openPartner=function(){
+  document.getElementById("partnerOverlay").classList.add("open");
+  // populate question select
+  const sel=document.getElementById("partnerQSelect");
+  sel.innerHTML=Object.entries(questions).map(([id,q])=>`<option value="${id}">${q.title.slice(0,40)}…</option>`).join("");
+};
+window.closePartner=function(){
+  document.getElementById("partnerOverlay").classList.remove("open");
+  if(roomRef&&partnerListener){off(roomRef);partnerListener=null;}
+  partnerConnected=false;roomId=null;
+  document.getElementById("partnerRoom").style.display="none";
+  document.getElementById("partnerSetup").style.display="";
+};
+window.joinOrCreate=function(){
+  if(!isConfigured){showToast("需要配置 Firebase 才能使用搭档对练");return;}
+  myName=document.getElementById("partnerName").value.trim()||"匿名";
+  const inputCode=document.getElementById("joinRoomInput").value.trim().toUpperCase();
+  roomId=inputCode||Math.random().toString(36).slice(2,8).toUpperCase();
+  document.getElementById("partnerSetup").style.display="none";
+  document.getElementById("partnerRoom").style.display="";
+  document.getElementById("roomCodeDisplay").textContent=roomId;
+  document.getElementById("partnerStatusText").textContent="等待搭档加入…";
+  document.getElementById("partnerDot").classList.remove("connected");
+  document.getElementById("partnerChat").innerHTML="";
+  roomRef=ref(db,"rooms/"+roomId);
+  // Announce presence
+  const myId="u"+Date.now();
+  fbSet("rooms/"+roomId+"/members/"+myId,{name:myName,joinedAt:Date.now()});
+  // Listen for messages
+  onValue(ref(db,"rooms/"+roomId+"/messages"),snap=>{
+    const msgs=snap.val()||{};
+    const chat=document.getElementById("partnerChat");
+    chat.innerHTML=Object.values(msgs).sort((a,b)=>a.ts-b.ts).map(m=>{
+      const isMe=m.sender===myName;
+      return `<div class="chat-msg ${isMe?"me":"them"}"><div class="chat-label">${m.sender}</div>${m.text}</div>`;
+    }).join("");
+    chat.scrollTop=chat.scrollHeight;
+  });
+  // Listen for members
+  onValue(ref(db,"rooms/"+roomId+"/members"),snap=>{
+    const members=snap.val()||{};
+    const others=Object.values(members).filter(m=>m.name!==myName);
+    if(others.length>0){
+      partnerConnected=true;
+      document.getElementById("partnerDot").classList.add("connected");
+      document.getElementById("partnerStatusText").textContent="已连接："+others.map(m=>m.name).join("、");
+    }
+  });
+};
+window.copyRoomCode=function(){
+  navigator.clipboard?.writeText(roomId).then(()=>showToast("房间号已复制 ✓")).catch(()=>showToast("请手动复制房间号："+roomId));
+};
+window.sendChat=function(){
+  const input=document.getElementById("chatMsgInput"),text=input.value.trim();if(!text||!roomId)return;
+  push(ref(db,"rooms/"+roomId+"/messages"),{sender:myName,text,ts:Date.now()});
+  input.value="";
+};
+window.sendQuestionToPartner=function(){
+  const sel=document.getElementById("partnerQSelect"),id=sel.value;
+  const q=questions[id];if(!q||!roomId)return;
+  push(ref(db,"rooms/"+roomId+"/messages"),{sender:myName,text:`📝 出题给你：${q.title}`,ts:Date.now()});
+  showToast("题目已发送给搭档");
+};
 
-  function copyAnswer(id) {
-    var txt = document.getElementById('answerContent_' + id).textContent;
-    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(function() { showToast('\u2705 \u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F'); }); }
-    else { var ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); showToast('\u2705 \u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F'); } catch (e) { showToast('\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u9009\u62E9\u6587\u5B57'); } document.body.removeChild(ta); }
-  }
+// ── Mastery / Star / Note ──
+window.setMastery=function(id,m){mastery[id]=m;fbSet("mastery/"+id,m);saveLocal("mastery",mastery);renderMain();};
+window.toggleStar=function(id){if(stars[id]){delete stars[id];fbRemove("stars/"+id);}else{stars[id]=true;fbSet("stars/"+id,true);}saveLocal("stars",stars);buildNav();renderMain();};
+window.noteInput=function(id){
+  clearTimeout(noteTimers[id]);
+  noteTimers[id]=setTimeout(()=>{const ta=document.getElementById("note_"+id);if(!ta)return;notes[id]=ta.value;fbSet("notes/"+id,ta.value);saveLocal("notes",notes);const s=document.getElementById("ns_"+id);if(s){s.classList.add("show");setTimeout(()=>s.classList.remove("show"),1600);}},800);
+};
+window.setSort=function(m){sortMode=m;renderMain();};
+window.setFilterMastery=function(m){filterMastery=m;renderMain();};
+window.toggleExpand=function(id){expandedId=expandedId===id?null:id;renderMain();};
 
-  function handleNoteInput(qid, v) { clearTimeout(noteTimers[qid]); noteTimers[qid] = setTimeout(function() { saveNote(qid, v); }, 800); }
+// ── CRUD ──
+window.openAdd=function(){
+  if(!isAdmin){showToast("请先登录管理员账号");openAdminAuth();return;}
+  editingId=null;document.getElementById("modalTitle").textContent="新增题目";
+  document.getElementById("fTitle").value="";document.getElementById("fChapter").value=currentView.chapter||"1";
+  updateSubOptions();if(currentView.sub)document.getElementById("fSub").value=currentView.sub;
+  document.getElementById("fTags").value="";document.getElementById("fAnswer").value="";
+  document.getElementById("editModal").classList.add("open");
+};
+window.openEdit=function(id){
+  if(!isAdmin){showToast("请先登录管理员账号");openAdminAuth();return;}
+  editingId=id;const q=questions[id];document.getElementById("modalTitle").textContent="编辑题目";
+  document.getElementById("fTitle").value=q.title||"";document.getElementById("fChapter").value=q.chapter||1;
+  updateSubOptions();document.getElementById("fSub").value=q.sub||"";
+  document.getElementById("fTags").value=(q.tags||[]).join("，");document.getElementById("fAnswer").value=q.answer||"";
+  document.getElementById("editModal").classList.add("open");
+};
+window.saveQuestion=function(){
+  const title=document.getElementById("fTitle").value.trim();if(!title){document.getElementById("fTitle").focus();return;}
+  const q={title,chapter:parseInt(document.getElementById("fChapter").value),sub:document.getElementById("fSub").value,tags:document.getElementById("fTags").value.split(/[，,]/).map(s=>s.trim()).filter(Boolean),answer:document.getElementById("fAnswer").value.trim(),createdAt:editingId?(questions[editingId]?.createdAt||Date.now()):Date.now()};
+  if(isConfigured){if(editingId)update(ref(db,"questions/"+editingId),q);else{const r=push(qRef);set(r,q);}}
+  else{const id=editingId||("q"+Date.now());questions[id]=q;saveLocal("qbank",questions);buildNav();renderMain();}
+  closeModal();showToast(editingId?"题目已更新 ✓":"题目已添加 ✓");
+};
+window.moveToTrash=function(id){
+  if(!isAdmin){showToast("请先登录管理员账号");openAdminAuth();return;}
+  const q=questions[id];
+  if(isConfigured){set(ref(db,"trash/"+id),{...q,deletedAt:Date.now()});remove(ref(db,"questions/"+id));}
+  else{trash[id]={...q,deletedAt:Date.now()};delete questions[id];saveLocal("qbank",questions);saveLocal("trash",trash);buildNav();renderMain();updateTrashCount();}
+  if(expandedId===id)expandedId=null;showToast("已移入回收站");
+};
+window.restoreQ=function(id){
+  if(!isAdmin){showToast("请先登录管理员账号");openAdminAuth();return;}
+  const q=trash[id],{deletedAt,...rest}=q;
+  if(isConfigured){set(ref(db,"questions/"+id),{...rest,createdAt:q.createdAt||Date.now()});remove(ref(db,"trash/"+id));}
+  else{questions[id]={...rest};delete trash[id];saveLocal("qbank",questions);saveLocal("trash",trash);buildNav();renderTrash();updateTrashCount();}
+  showToast("已恢复 ✓");
+};
+window.permDelete=function(id){
+  if(!isAdmin){showToast("请先登录管理员账号");openAdminAuth();return;}
+  if(!confirm("彻底删除后无法恢复，确认？"))return;
+  if(isConfigured)remove(ref(db,"trash/"+id));else{delete trash[id];saveLocal("trash",trash);renderTrash();updateTrashCount();}
+  showToast("已彻底删除");
+};
+function updateTrashCount(){const c=Object.keys(trash).length;document.getElementById("trashCount").textContent=c||"";}
+window.updateSubOptions=function(){const ch=CHAPTERS.find(c=>c.id===parseInt(document.getElementById("fChapter").value));document.getElementById("fSub").innerHTML=ch.subs.map(s=>`<option>${s}</option>`).join("");};
+window.onSearch=function(){searchQuery=document.getElementById("searchInput").value;renderMain();};
+window.closeModal=function(){document.getElementById("editModal").classList.remove("open");};
+window.openSidebar=function(){document.getElementById("sidebar").classList.add("open");document.getElementById("sidebarOverlay").classList.add("open");};
+window.closeSidebar=function(){document.getElementById("sidebar").classList.remove("open");document.getElementById("sidebarOverlay").classList.remove("open");};
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200);}
 
-  function populateCategorySelect() { var s = document.getElementById('formCategory'); s.innerHTML = '<option value="">\u8BF7\u9009\u62E9\u9898\u578B\u5206\u7C7B</option>' + CATEGORIES.map(function(c) { return '<option value="' + escAttr(c) + '">' + escHtml(c) + '</option>'; }).join(''); }
-
-  function openAddModal() { editingId = null; showToast('\u2795 \u65B0\u589E\u6A21\u5F0F'); document.getElementById('modalTitle').textContent = '\u65B0\u589E\u9898\u76EE'; document.getElementById('editQuestionId').value = ''; document.getElementById('formCategory').value = ''; document.getElementById('formQuestion').value = ''; document.getElementById('formAnswer').value = ''; document.getElementById('formImage').value = ''; clearImage(); document.getElementById('questionModal').classList.add('active'); attachPaste(); }
-
-  function openEditModal(id) { var q = questions.find(function(x) { return x.id === id; }); if (!q) return; editingId = id; document.getElementById('formQuestion').value = q.question; showToast('\u270F\uFE0F \u7F16\u8F91: ' + q.question.substring(0,15)); document.getElementById('modalTitle').textContent = '\u7F16\u8F91\u9898\u76EE'; document.getElementById('editQuestionId').value = id; document.getElementById('formCategory').value = q.category; document.getElementById('formQuestion').value = q.question; document.getElementById('formAnswer').value = q.answer || ''; document.getElementById('formImage').value = q.image || ''; if (q.image) { setImagePreview(q.image); } else { clearImage(); } document.getElementById('questionModal').classList.add('active'); }
-
-  function closeModal() { document.getElementById('questionModal').classList.remove('active'); detachPaste(); clearImage(); }
-  function closeModalOutside(e) { if (e.detail === 0) return; if (e.type !== 'click') return; if (e.target !== document.getElementById('questionModal')) return; var panel = document.querySelector('#questionModal .modal-panel'); if (panel) { var rect = panel.getBoundingClientRect(); if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) return; } closeModal(); }
-
-  function handleFormSubmit(e) { if (e && e.ctrlKey) return; e.preventDefault(); var cat = document.getElementById('formCategory').value; var qtxt = document.getElementById('formQuestion').value; var atxt = document.getElementById('formAnswer').value; var img = document.getElementById('formImage').value.trim(); if (!cat) { showToast('\u8BF7\u9009\u62E9\u9898\u578B\u5206\u7C7B'); return; } if (qtxt.length === 0) { showToast('\u8BF7\u8F93\u5165\u9762\u8BD5\u9898\u5E72'); return; } if (editingId) { var i = questions.findIndex(function(x) { return x.id === editingId; }); if (i !== -1) { var updated = { id: editingId, category: cat, question: qtxt, answer: atxt, image: img }; questions.splice(i, 1, updated); showToast('\u2705 \u5DF2\u66F4\u65B0: ' + qtxt.substring(0,15)); } else { showToast('\u66F4\u65B0\u5931\u8D25\uFF1A\u627E\u4E0D\u5230\u9898\u76EE'); } } else { questions.push({ id: genId(), category: cat, question: qtxt, answer: atxt, image: img }); showToast('\u9898\u76EE\u5DF2\u6DFB\u52A0'); } saveQuestions(questions); closeModal(); renderSidebar(); renderQuestions(); }
-  function confirmDelete(id) { pendingDel = id; var d = document.getElementById('confirmDialog'); d.classList.remove('hidden'); d.classList.add('flex'); document.getElementById('confirmDeleteBtn').onclick = function() { executeDelete(); }; }
-  function restoreQuestion(id) { var found = deletedQuestions.find(function(q) { return q.id === id; }); if (!found) return; delete found.deletedAt; questions.push(found); deletedQuestions = deletedQuestions.filter(function(q) { return q.id !== id; }); saveQuestions(questions); saveDeleted(deletedQuestions); renderTrash(); renderSidebar(); renderQuestions(); showToast('题目已恢复'); }
-  function permanentDelete(id) { deletedQuestions = deletedQuestions.filter(function(q) { return q.id !== id; }); saveDeleted(deletedQuestions); renderTrash(); renderSidebar(); showToast('已永久删除'); }
-  function emptyTrash() { if (!confirm('确定清空回收站？此操作不可恢复。')) return; deletedQuestions = []; saveDeleted(deletedQuestions); closeTrashModal(); renderSidebar(); showToast('回收站已清空'); }
-  function closeConfirmDialog() { pendingDel = null; var d = document.getElementById('confirmDialog'); d.classList.add('hidden'); d.classList.remove('flex'); }
-  function executeDelete() { if (!pendingDel) return; var found = questions.find(function(q) { return q.id === pendingDel; }); if (found) { found.deletedAt = Date.now(); deletedQuestions.push(found);
-       saveDeleted(deletedQuestions); } questions = questions.filter(function(q) { return q.id !== pendingDel; }); saveQuestions(questions); closeConfirmDialog(); renderSidebar(); renderQuestions(); showToast('\u9898\u76EE\u5DF2\u79FB\u5165\u56DE\u6536\u7AD9'); }
-
-  function handleBackToTop() { var b = document.getElementById('backToTop'); if (window.scrollY > 400) b.classList.add('visible'); else b.classList.remove('visible'); }
-  function handleKeyboard(e) { if (['Control','Meta','Alt','Shift'].indexOf(e.key) !== -1) return; if (e.ctrlKey || e.metaKey || e.altKey) return; if (e.key === 'Escape') { if (document.querySelector('.dyn-lightbox')) { closeLightbox(); return; } if (!document.getElementById('confirmDialog').classList.contains('hidden')) { closeConfirmDialog(); return; } } }
-
-  function init() {
-    questions = loadQuestions();
-    deletedQuestions = loadDeleted();
-       darkMode = loadDarkMode(); applyDarkMode(darkMode);
-    currentCategory = loadCategory();
-    if (currentCategory && CATEGORIES.indexOf(currentCategory) === -1) currentCategory = null;
-    populateCategorySelect();
-    renderSidebar(); renderQuestions(); updateHeader();
-    window.addEventListener('scroll', handleBackToTop, { passive: true });
-    document.addEventListener('keydown', handleKeyboard);
-    handleBackToTop();
-    initSync();
-    checkStorageQuota();
-    var fq = document.getElementById('formQuestion'); if (fq) fq.addEventListener('input', function() { window._formQValue = this.value; });
-    try { document.getElementById('questionList').addEventListener('click', function(e) { var t = e.target; if (t.tagName === 'IMG' && t.alt === '题目图片') { if (t.tagName === 'IMG' && t.alt === '题目图片') openLightbox(t.src); } }); } catch(x) {}
-        document.getElementById('confirmDialog').addEventListener('click', function(e) { if (e.target === this) closeConfirmDialog(); });
-  }
-
-  function openSyncModal() { var url = loadSyncUrl(); var input = document.getElementById('syncUrlInput'); if (input && url) input.value = url; document.getElementById('syncModal').classList.add('active'); }
-  function closeSyncModal() { document.getElementById('syncModal').classList.remove('active'); }
-  function closeSyncModalOutside(e) { if (e.target === document.getElementById('syncModal')) closeSyncModal(); }
-  function saveSyncConfig() { var url = document.getElementById('syncUrlInput').value.trim(); if (!url) { showToast('请输入数据库 URL'); return; } if (url.indexOf('firebasedatabase.app') === -1) { showToast('URL 格式不正确，请检查'); return; } saveSyncUrl(url); syncUrl = url; syncEnabled = true; updateSyncUI(); closeSyncModal(); showToast('云同步已启用'); syncAllFromCloud(); }
-  function disableSync() { saveSyncUrl(''); syncUrl = ''; syncEnabled = false; updateSyncUI(); closeSyncModal(); showToast('云同步已关闭'); }
-  function handleImageFile(input) { var f = input.files[0]; if (!f) return; var reader = new FileReader(); reader.onload = function(e) { compressImage(e.target.result, 1200, 0.85, function(compressed) { setImagePreview(compressed); }); }; reader.readAsDataURL(f); }
-  function compressImage(dataUrl, maxSize, quality, cb) { var img = new Image(); img.onload = function() { var w = img.width, h = img.height; if (w <= maxSize && h <= maxSize) { cb(dataUrl); return; } var ratio = Math.min(maxSize / w, maxSize / h); w = Math.round(w * ratio); h = Math.round(h * ratio); var canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h; var ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h); cb(canvas.toDataURL('image/jpeg', quality)); }; img.src = dataUrl; }
-  function setImagePreview(dataUrl) { document.getElementById('formImage').value = dataUrl; document.getElementById('imagePreviewImg').src = dataUrl; document.getElementById('imagePreview').classList.remove('hidden'); document.getElementById('imagePlaceholder').classList.add('hidden'); document.getElementById('clearImageBtn').classList.remove('hidden'); }
-  function clearImage() { document.getElementById('formImage').value = ''; document.getElementById('imagePreview').classList.add('hidden'); document.getElementById('imagePlaceholder').classList.remove('hidden'); document.getElementById('clearImageBtn').classList.add('hidden'); document.getElementById('formImageFile').value = ''; }
-  var _pasteHandler = null;
-  function attachPaste() { if (_pasteHandler) return; _pasteHandler = function(e) { if (!document.getElementById('questionModal').classList.contains('active')) return; if (!e.clipboardData || !e.clipboardData.items) return; var items = e.clipboardData.items; for (var i = 0; i < items.length; i++) { if (items[i].type.indexOf('image') !== -1) { e.preventDefault(); var blob = items[i].getAsFile(); var reader = new FileReader(); reader.onload = function(ev) { setImagePreview(ev.target.result); }; reader.onload = function(ev) { compressImage(ev.target.result, 1200, 0.85, function(c) { setImagePreview(c); }); }; reader.readAsDataURL(blob); break; } } }; document.addEventListener('paste', _pasteHandler); }
-  function detachPaste() { if (_pasteHandler) { document.removeEventListener('paste', _pasteHandler); _pasteHandler = null; } }
-  function handleSyncClick() { syncNow(); }
-  function testSyncConnection() { var url = document.getElementById('syncUrlInput').value.trim(); var el = document.getElementById('syncTestResult'); if (!url) { el.textContent = '请输入 URL'; el.className = 'text-xs text-red-500'; return; } el.textContent = '测试中…'; el.className = 'text-xs text-blue-500'; fetch(url + '/.json').then(function(r) { if (r.ok) { el.textContent = '✓ 连接成功'; el.className = 'text-xs text-green-500'; } else { el.textContent = '✗ 连接失败 (' + r.status + ')'; el.className = 'text-xs text-red-500'; } }).catch(function(e) { el.textContent = '✗ 连接失败: ' + e.message; el.className = 'text-xs text-red-500'; }); }
-
-  function openBatchImportModal() { populateBatchCategory(); document.getElementById('batchImportModal').classList.add('active'); }
-  function closeBatchImportModal() { document.getElementById('batchImportModal').classList.remove('active'); }
-  function closeBatchImportOutside(e) { if (e.target === document.getElementById('batchImportModal')) closeBatchImportModal(); }
-  function populateBatchCategory() { var s = document.getElementById('batchCategory'); s.innerHTML = '<option value="">请选择分类</option>' + CATEGORIES.map(function(c) { return '<option value="' + escAttr(c) + '">' + escHtml(c) + '</option>'; }).join(''); }
-  function parseBatchPreview() { var raw = document.getElementById('batchContent').value.trim(); var el = document.getElementById('batchPreview'); if (!raw) { el.textContent = ''; return; } var blocks = raw.split(/\n---\n|\n---$/); var count = 0; blocks.forEach(function(b) { var m = b.match(/Q[：:]\s*(.+)/); if (m && m[1].trim()) count++; }); el.textContent = '识别到 ' + count + ' 道题目'; el.className = count > 0 ? 'text-xs text-green-500 ml-3' : 'text-xs text-red-500 ml-3'; }
-  function executeBatchImport() { var cat = document.getElementById('batchCategory').value; var raw = document.getElementById('batchContent').value.trim(); if (!cat) { showToast('请选择默认分类'); return; } if (!raw) { showToast('请粘贴问答内容'); return; } var blocks = raw.split(/\n---\n|\n---$/); var added = 0; blocks.forEach(function(b) { var qMatch = b.match(/Q[：:]\s*(.+)/); var aMatch = b.match(/A[：:]\s*([\s\S]+)/); var iMatch = b.match(/[IP][：:]\s*(.+)/); var question = qMatch ? qMatch[1].trim() : ''; var answer = aMatch ? aMatch[1].trim() : ''; var image = iMatch ? iMatch[1].trim() : ''; if (question) { questions.push({ id: genId(), category: cat, question: question, answer: answer, image: image }); added++; } }); if (added === 0) { showToast('未识别到有效题目，请检查格式'); return; } saveQuestions(questions); closeBatchImportModal(); renderSidebar(); renderQuestions(); showToast('已导入 ' + added + ' 道题目'); }
-
-  window.selectCategory = selectCategory;
-  window.toggleSidebar = toggleSidebar;
-  window.closeSidebar = closeSidebar;
-  window.toggleAnswer = toggleAnswer;
-  window.copyAnswer = copyAnswer;
-  window.openAddModal = openAddModal;
-  window.openEditModal = openEditModal;
-  window.closeModal = closeModal;
-  window.closeModalOutside = closeModalOutside;
-  window.handleFormSubmit = handleFormSubmit;
-  window.confirmDelete = confirmDelete;
-  window.closeConfirmDialog = closeConfirmDialog;
-  window.handleSearch = handleSearch;
-  window.toggleDarkMode = toggleDarkMode;
-  window.scrollToTop = scrollToTop;
-  window.openSyncModal = openSyncModal;
-  window.closeSyncModal = closeSyncModal;
-  window.closeSyncModalOutside = closeSyncModalOutside;
-  window.saveSyncConfig = saveSyncConfig;
-  window.disableSync = disableSync;
-  window.testSyncConnection = testSyncConnection;
-  window.handleSyncClick = handleSyncClick;
-  window.syncNow = syncNow;
-  window.openBatchImportModal = openBatchImportModal;
-  window.closeBatchImportModal = closeBatchImportModal;
-  window.closeBatchImportOutside = closeBatchImportOutside;
-  window.parseBatchPreview = parseBatchPreview;
-  window.openLightbox = function(src) { var ex = document.querySelector('.dyn-lightbox'); if (ex) ex.remove(); var ov = document.createElement('div'); ov.className = 'dyn-lightbox'; ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out'; ov.onclick = function() { ov.remove(); }; var im = document.createElement('img'); im.src = src; im.style.cssText = 'max-width:95vw;max-height:95vh;object-fit:contain;border-radius:4px'; ov.appendChild(im); document.body.appendChild(ov); var esc = function(e) { if (e.key === 'Escape') { ov.remove(); document.removeEventListener('keydown', esc); } }; document.addEventListener('keydown', esc); };
-  window.closeLightbox = function() { var ex = document.querySelector('.dyn-lightbox'); if (ex) ex.remove(); };
-  window.verifyAdmin = verifyAdmin;
-  window.submitAdmin = submitAdmin;
-  window.openLogin = openLogin;
-  window.openTrashModal = openTrashModal;
-  window.closeTrashModal = closeTrashModal;
-  window.closeTrashModalOutside = closeTrashModalOutside;
-  window.restoreQuestion = restoreQuestion;
-  window.permanentDelete = permanentDelete;
-  window.emptyTrash = emptyTrash;
-  window.closeAdminModal = closeAdminModal;
-  window.restoreQuestion = restoreQuestion;
-  window.permanentDelete = permanentDelete;
-  window.emptyTrash = emptyTrash;
-  window.openTrashModal = openTrashModal;
-  window.closeTrashModal = closeTrashModal;
-  window.closeTrashModalOutside = closeTrashModalOutside;
-  function openTrashModal() { verifyAdmin(function() { renderTrash(); document.getElementById('trashModal').classList.add('active'); }); }
-  function closeTrashModal() { document.getElementById('trashModal').classList.remove('active'); }
-  function closeTrashModalOutside(e) { if (e.target === document.getElementById('trashModal')) closeTrashModal(); }
-  function renderTrash() { var container = document.getElementById('trashContent'); var countEl = document.getElementById('trashCount'); if (countEl) countEl.textContent = deletedQuestions.length; if (deletedQuestions.length === 0) { container.innerHTML = '<div class="text-center py-10 text-gray-400 dark:text-gray-500"><p class="text-lg">回收站是空的</p></div>'; return; } var h = '<div class="flex items-center justify-between mb-4"><span class="text-sm text-gray-500">' + deletedQuestions.length + ' 道题目</span><button onclick="emptyTrash()" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-xs rounded-lg transition-colors">清空回收站</button></div>'; deletedQuestions.forEach(function(q) { var dt = q.deletedAt ? new Date(q.deletedAt) : new Date(); var timeStr = (dt.getMonth()+1) + '/' + dt.getDate() + ' ' + dt.getHours().toString().padStart(2,'0') + ':' + dt.getMinutes().toString().padStart(2,'0'); var catIdx = CATEGORIES.indexOf(q.category); var colors = ['bg-blue-100 text-blue-700 dark:bg-blue-900/40','bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40','bg-amber-100 text-amber-700 dark:bg-amber-900/40','bg-red-100 text-red-700 dark:bg-red-900/40','bg-purple-100 text-purple-700 dark:bg-purple-900/40','bg-teal-100 text-teal-700 dark:bg-teal-900/40','bg-pink-100 text-pink-700 dark:bg-pink-900/40']; var cc = colors[catIdx] || colors[0]; h += '<div class="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700"><div class="flex-1 min-w-0"><span class="inline-block px-2 py-0.5 text-xs rounded-md ' + cc + ' mr-2">' + escHtml(q.category) + '</span><span class="text-xs text-gray-400">' + timeStr + '</span><p class="text-sm text-gray-700 dark:text-gray-300 mt-1 truncate">' + escHtml(q.question).substring(0,50) + (q.question.length > 50 ? '...' : '') + '</p></div><div class="flex items-center gap-2 ml-4 shrink-0"><button onclick="restoreQuestion(\'' + q.id + '\')" class="px-2.5 py-1 text-xs bg-green-600 hover:bg-green-500 text-white rounded transition-colors">恢复</button><button onclick="permanentDelete(\'' + q.id + '\')" class="px-2.5 py-1 text-xs bg-gray-500 hover:bg-gray-400 text-white rounded transition-colors">彻底删除</button></div></div>'; }); container.innerHTML = h; }window.openTrashModal = openTrashModal;
-  window.closeTrashModal = closeTrashModal;
-  window.closeTrashModalOutside = closeTrashModalOutside;
-  window.restoreQuestion = restoreQuestion;
-  window.permanentDelete = permanentDelete;
-  window.emptyTrash = emptyTrash;
-  window.closeAdminModal = closeAdminModal;
-  window.restoreQuestion = restoreQuestion;
-  window.permanentDelete = permanentDelete;
-  window.emptyTrash = emptyTrash;
-  window.openTrashModal = openTrashModal;
-  window.closeTrashModal = closeTrashModal;
-  window.closeTrashModalOutside = closeTrashModalOutside;
-  function openTrashModal() { verifyAdmin(function() { renderTrash(); document.getElementById('trashModal').classList.add('active'); }); }
-  function closeTrashModal() { document.getElementById('trashModal').classList.remove('active'); }
-  function closeTrashModalOutside(e) { if (e.target === document.getElementById('trashModal')) closeTrashModal(); }
-  function renderTrash() { var container = document.getElementById('trashContent'); var countEl = document.getElementById('trashCount'); if (countEl) countEl.textContent = deletedQuestions.length; if (deletedQuestions.length === 0) { container.innerHTML = '<div class="text-center py-10 text-gray-400 dark:text-gray-500"><p class="text-lg">回收站是空的</p></div>'; return; } var h = '<div class="flex items-center justify-between mb-4"><span class="text-sm text-gray-500">' + deletedQuestions.length + ' 道题目</span><button onclick="emptyTrash()" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-xs rounded-lg transition-colors">清空回收站</button></div>'; deletedQuestions.forEach(function(q) { var dt = q.deletedAt ? new Date(q.deletedAt) : new Date(); var timeStr = (dt.getMonth()+1) + '/' + dt.getDate() + ' ' + dt.getHours().toString().padStart(2,'0') + ':' + dt.getMinutes().toString().padStart(2,'0'); var catIdx = CATEGORIES.indexOf(q.category); var colors = ['bg-blue-100 text-blue-700 dark:bg-blue-900/40','bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40','bg-amber-100 text-amber-700 dark:bg-amber-900/40','bg-red-100 text-red-700 dark:bg-red-900/40','bg-purple-100 text-purple-700 dark:bg-purple-900/40','bg-teal-100 text-teal-700 dark:bg-teal-900/40','bg-pink-100 text-pink-700 dark:bg-pink-900/40']; var cc = colors[catIdx] || colors[0]; h += '<div class="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700"><div class="flex-1 min-w-0"><span class="inline-block px-2 py-0.5 text-xs rounded-md ' + cc + ' mr-2">' + escHtml(q.category) + '</span><span class="text-xs text-gray-400">' + timeStr + '</span><p class="text-sm text-gray-700 dark:text-gray-300 mt-1 truncate">' + escHtml(q.question).substring(0,50) + (q.question.length > 50 ? '...' : '') + '</p></div><div class="flex items-center gap-2 ml-4 shrink-0"><button onclick="restoreQuestion(\'' + q.id + '\')" class="px-2.5 py-1 text-xs bg-green-600 hover:bg-green-500 text-white rounded transition-colors">恢复</button><button onclick="permanentDelete(\'' + q.id + '\')" class="px-2.5 py-1 text-xs bg-gray-500 hover:bg-gray-400 text-white rounded transition-colors">彻底删除</button></div></div>'; }); container.innerHTML = h; }
-  function openTrashModal() { verifyAdmin(function() { renderTrash(); document.getElementById('trashModal').classList.add('active'); }); }
-  function closeTrashModal() { document.getElementById('trashModal').classList.remove('active'); }
-  function closeTrashModalOutside(e) { if (e.target === document.getElementById('trashModal')) closeTrashModal(); }
-  function renderTrash() { var c = document.getElementById('trashContent'); var tc = document.getElementById('trashCount'); if (tc) tc.textContent = deletedQuestions.length; if (deletedQuestions.length === 0) { c.innerHTML = '<div class="text-center py-10 text-gray-400"><p class="text-lg">\u56DE\u6536\u7AD9\u662F\u7A7A\u7684</p></div>'; return; } var h = '<div class="flex items-center justify-between mb-4"><span class="text-sm text-gray-500">' + deletedQuestions.length + ' \u9053\u9898\u76EE</span><button onclick="emptyTrash()" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white text-xs rounded-lg transition-colors">\u6E05\u7A7A\u56DE\u6536\u7AD9</button></div>'; deletedQuestions.forEach(function(q) { var dt = q.deletedAt ? new Date(q.deletedAt) : new Date(); var ts = (dt.getMonth()+1) + '/' + dt.getDate() + ' ' + String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0'); var ci = CATEGORIES.indexOf(q.category); var cols = ['bg-blue-100 text-blue-700 dark:bg-blue-900/40','bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40','bg-amber-100 text-amber-700 dark:bg-amber-900/40','bg-red-100 text-red-700 dark:bg-red-900/40','bg-purple-100 text-purple-700 dark:bg-purple-900/40','bg-teal-100 text-teal-700 dark:bg-teal-900/40','bg-pink-100 text-pink-700 dark:bg-pink-900/40']; var cc = cols[ci] || cols[0]; h += '<div class="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700"><div class="flex-1 min-w-0"><span class="inline-block px-2 py-0.5 text-xs rounded-md ' + cc + ' mr-2">' + escHtml(q.category) + '</span><span class="text-xs text-gray-400">' + ts + '</span><p class="text-sm text-gray-700 dark:text-gray-300 mt-1 truncate">' + escHtml(q.question).substring(0,50) + (q.question.length > 50 ? '...' : '') + '</p></div><div class="flex items-center gap-2 ml-4 shrink-0"><button onclick="restoreQuestion(\'' + q.id + '\')" class="px-2.5 py-1 text-xs bg-green-600 hover:bg-green-500 text-white rounded transition-colors">\u6062\u590D</button><button onclick="permanentDelete(\'' + q.id + '\')" class="px-2.5 py-1 text-xs bg-gray-500 hover:bg-gray-400 text-white rounded transition-colors">\u5F7B\u5E95\u5220\u9664</button></div></div>'; }); c.innerHTML = h; }
-  function restoreQuestion(id) { var f = deletedQuestions.find(function(q) { return q.id === id; }); if (!f) return; delete f.deletedAt; questions.push(f); deletedQuestions = deletedQuestions.filter(function(q) { return q.id !== id; }); saveQuestions(questions); saveDeleted(deletedQuestions); renderTrash(); renderSidebar(); renderQuestions(); showToast('\u9898\u76EE\u5DF2\u6062\u590D'); }
-  function permanentDelete(id) { deletedQuestions = deletedQuestions.filter(function(q) { return q.id !== id; }); saveDeleted(deletedQuestions); renderTrash(); renderSidebar(); showToast('\u5DF2\u6C38\u4E45\u5220\u9664'); }
-  function emptyTrash() { if (!confirm('\u786E\u5B9A\u6E05\u7A7A\u56DE\u6536\u7AD9\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u6062\u590D\u3002')) return; deletedQuestions = []; saveDeleted(deletedQuestions); closeTrashModal(); renderSidebar(); showToast('\u56DE\u6536\u7AD9\u5DF2\u6E05\u7A7A'); }
-  window.executeBatchImport = executeBatchImport;
-  window.handleImageFile = handleImageFile;
-  window.setImagePreview = setImagePreview;
-  window.clearImage = clearImage;
-  window.attachPaste = attachPaste;
-  window.detachPaste = detachPaste;
-
-  var _adminCb = null;
-  function verifyAdmin(cb) { if (isAdmin) { cb(); return; } _adminCb = cb; openLogin(); }
-  function submitAdmin() { var pw = document.getElementById('adminPassword').value; if (pw === '00') { isAdmin = true; document.body.classList.add('admin-active'); document.getElementById('adminModal').style.display = 'none'; document.getElementById('adminPassword').value = ''; showToast('\u2705 \u7BA1\u7406\u5458\u9A8C\u8BC1\u6210\u529F'); var badge = document.getElementById('adminBadge'); if (badge) badge.style.display = 'block'; renderSidebar(); renderQuestions(); var c = _adminCb; _adminCb = null; if (c) c(); } else { showToast('\u5BC6\u7801\u9519\u8BEF'); } }
-  function openLogin() { var pw = prompt('\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801'); if (pw === '00') { isAdmin = true; document.body.classList.add('admin-active'); showToast('\u2705 \u7BA1\u7406\u5458\u9A8C\u8BC1\u6210\u529F'); var badge = document.getElementById('adminBadge'); if (badge) badge.style.display = 'block'; var lb = document.querySelector('[onclick="openLogin()"]'); if (lb) lb.style.display = 'none'; if (_adminCb) { var c = _adminCb; _adminCb = null; c(); } } else if (pw !== null) { showToast('\u5BC6\u7801\u9519\u8BEF'); } }
-  function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; document.getElementById('adminPassword').value = ''; _adminCb = null; }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
-})();
+// ── Init ──
+updateSubOptions();
+if(isConfigured){
+  const app=initializeApp(FIREBASE_CONFIG);db=getDatabase(app);
+  qRef=ref(db,"questions");trashRef=ref(db,"trash");notesRef=ref(db,"notes");
+  masteryRef=ref(db,"mastery");starsRef=ref(db,"stars");wrongRef=ref(db,"wrong");statsRef=ref(db,"practiceStats");
+  setSyncState("syncing");
+  onValue(qRef,snap=>{questions=snap.val()||{};if(!Object.keys(questions).length){SEED.forEach(q=>{const r=push(qRef);set(r,{...q,createdAt:Date.now()});});}setSyncState("ok");buildNav();renderMain();checkAdminState();});
+  onValue(trashRef,snap=>{trash=snap.val()||{};updateTrashCount();if(currentView.type==="trash")renderTrash();});
+  onValue(notesRef,snap=>{notes=snap.val()||{};});
+  onValue(masteryRef,snap=>{mastery=snap.val()||{};});
+  onValue(starsRef,snap=>{stars=snap.val()||{};buildNav();});
+  onValue(wrongRef,snap=>{wrongSet=snap.val()||{};buildNav();});
+  onValue(statsRef,snap=>{practiceStats=snap.val()||{};});
+}else{
+  setSyncState("offline");
+  questions=getLocal("qbank",null)||(()=>{const obj={};SEED.forEach((q,i)=>{obj["q"+i]={...q,createdAt:Date.now()-i*1000};});saveLocal("qbank",obj);return obj;})();
+  trash=getLocal("trash",{});notes=getLocal("notes",{});mastery=getLocal("mastery",{});
+  stars=getLocal("stars",{});wrongSet=getLocal("wrong",{});practiceStats=getLocal("practiceStats",{});
+  buildNav();renderMain();updateTrashCount();
+}
+checkAdminState();
 </script>
-<div id="imageLightbox" class="lightbox" onclick="closeLightbox()"><img id="lightboxImg" src="" alt=""></div>
-
-<div id="adminModal" class="modal-overlay fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" style="display:none"><div class="modal-panel bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-sm" onclick="event.stopPropagation()"><div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700"><h3 class="text-lg font-bold text-navy-900 dark:text-gray-100">管理员验证</h3></div><div class="px-6 py-5 space-y-4"><p class="text-sm text-gray-600 dark:text-gray-400">输入密码后可新增、编辑、删除题目</p><input id="adminPassword" type="password" placeholder="请输入密码" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" onkeydown="if(event.key==='Enter')submitAdmin()"><div class="flex items-center justify-end gap-3 pt-2"><button onclick="closeAdminModal()" class="px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">取消</button><button onclick="submitAdmin()" class="px-5 py-2.5 bg-navy-800 dark:bg-blue-600 hover:bg-navy-700 dark:hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">确认</button></div></div></div></div>
 </body>
 </html>
